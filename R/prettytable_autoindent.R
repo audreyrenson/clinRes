@@ -15,7 +15,7 @@ prettytable_autoindent <- function(vars, data, nspaces=6, includeNA = TRUE,
 
   spaces = paste( rep("&nbsp;", nspaces), collapse="")
 
-  varTypes <- unlist(mosaic::dfapply(data.frame(type = data[,vars], class)))
+  varTypes <- data.frame(type = unlist(mosaic::dfapply(data[,vars], class)))
   varTypes$varname <- rownames(varTypes)
 
 
