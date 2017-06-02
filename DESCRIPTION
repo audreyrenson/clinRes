@@ -13,4 +13,5 @@ Imports:
   reshape2,
   tableone,
   sandwich,
-  ggplot2
+  ggplot2,
+  lsr
