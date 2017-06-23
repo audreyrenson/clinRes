@@ -76,6 +76,43 @@ fmt.glm_table <- function(glm_tbl, tbl_colnames = c(colnames(glm_tbl)[1], "95% C
 
 }
 
+glm_table_indents <- function(fit, ...) {
+
+  tbl <- glm_table(fit, ...)
+
+  INDENTS <- "&nbps"
+  BLANKROW <- rep("", ncol(tbl))
+  REFROW <- c(1, rep("Ref", ncol(tbl)-1))
+
+  vars <- as.character(attr(fit$terms, "variables"))[c(-1,-2)]
+  dat <- fit$data[,vars, drop=FALSE]
+  var_classes <- sapply(vars, function(i) class(dat[,i]))
+
+  numeric_vars <- vars[var_classes %in% c("numeric","integer")]
+  factor_vars <- vars[var_classes %in% c("factor","character","logical")]
+
+  var_rownums <- sapply(vars, function(i) if(i %in% numeric_vars) 1 else length(fit$xlevels[[i]]) + 1 )
+  var_rownames <- sapply(vars, function(i) if(i %in% numeric_vars) i else c(i, fit$xlevels[[i]]))
+
+  list_tblrows <- vector("list", length = length(vars))
+  names(list_tblrows) <- vars
+
+  list_tblrows <- lapply(vars, function(i)
+    if(i %in% rownames(tbl)) tb <- tbl[i,,drop=FALSE] else {
+      tb <- rbind(BLANKROW, REFROW, tbl[paste0(i, var_rownames[[i]][c(-1,-2)]) ,])
+      rownames(tb) <- paste0(c("",rep(INDENTS, nrow(tb)-1)), var_rownames[[i]])
+      tb
+    }
+  )
+
+
+  list_tblrows
+
+  tbl_out <- do.call(rbind, list_tblrows)
+
+  tbl_out
+
+}
 
 
 
