@@ -76,13 +76,16 @@ fmt.glm_table <- function(glm_tbl, tbl_colnames = c(colnames(glm_tbl)[1], "95% C
 
 }
 
-glm_table_indents <- function(fit, ...) {
+glm_table_indents <- function(fit, ref_txt="Ref", digits=4,
+                              ref_num=if(fit$family$link %in% c("log","logit")) 1 else 0,  ...) {
 
-  tbl <- glm_table(fit, ...)
+  tbl <- glm_table(fit, digits = digits, ...)
+
+  ref_num <- format(as.numeric(ref_num), digits=digits, nsmall=digits)
 
   INDENTS <- "&nbps"
   BLANKROW <- rep("", ncol(tbl))
-  REFROW <- c(1, rep("Ref", ncol(tbl)-1))
+  REFROW <- c(ref_num, rep(ref_txt, ncol(tbl)-1))
 
   vars <- as.character(attr(fit$terms, "variables"))[c(-1,-2)]
   dat <- fit$data[,vars, drop=FALSE]
