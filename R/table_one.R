@@ -1,14 +1,25 @@
 #' Produce formatted descriptives tables
 #'
-#' This function mirrors createTableOne, but allows for more customization.
+#' Theses functions mirror createTableOne, but allow for more customization.
 #'
+#' @param x,y Variables for univariate p-value calculation. Within \code{table_one}, these work out to be \code{x=data[[strata]], y=data[[vars[i]]]}.
 #' @param vars Character vector. The column names of variables to summarize.
 #' @param varlables Character vector. The labels for variables in the returned table. Should be the same length as \code{var}.
-#'
+#' @param data Data.frame in which to look for variables.
+#' @param strata Character. Stratifying variable.
+#' @param normal Character vector. Variables to treat as normally distributed. If not included in this, numeric variables are considered non-normal.
+#' @param exact Character vector. Variable to perform exact tests on.
+#' @param fun_n_prc,fun_norm,fun_nonnorm Summary measure functions.
+#' @param fun_apprx_p,fun_exact_p,fun_norm_p,fun_nonnorm_p P-value functions.
+#' @param fun_p_fm Formatting function for p-values.
+#' @param measurelab_nonnormal,measurelab_normal,measurelab_cat Character. Text to put in the row indicating how the variable is summarized.
+#' @param sep Character. Text to separate the variable label from the measure label.
+#' @param nspaces Integer. Number of spaces to indent factor levels.
+
+#' @include summary_measures.R
+#' @include formatting_functions.R
 
 #' @export
-#' @include prettytable_functions.R
-
 table_one <- function(vars, varlabels=vars, data, strata, normal=NULL, exact=NULL,
                       fun_n_prc=n_perc,  fun_apprx_p=p_cat_apprx, fun_exact_p=p_cat_exact,
                       fun_norm=mean_sd, fun_nonnorm=median_iqr,  fun_norm_p=p_cont_norm,
@@ -44,6 +55,8 @@ table_one <- function(vars, varlabels=vars, data, strata, normal=NULL, exact=NUL
 }
 
 
+#' @export
+#' @rdname table_one
 cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
                        fun_norm=mean_sd, fun_nonnorm=median_iqr,  fun_norm_p=p_cont_norm,
                        fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt,
@@ -68,6 +81,8 @@ cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
   tbl
 }
 
+#' @export
+#' @rdname table_one
 cat_table <- function(vars, varlabels=vars, data, strata, exact=NULL,
                       fun_n_prc=n_perc,  fun_apprx_p=p_cat_apprx, fun_exact_p=p_cat_exact,
                       fun_p_fmt = p_fmt, measurelab_cat="n (%)",sep=" -- ", nspaces=6,...) {
@@ -92,3 +107,17 @@ cat_table <- function(vars, varlabels=vars, data, strata, exact=NULL,
   rownames(tbl) = unlist(lapply(1:nvars, function(i) c(var_measure_labs[i],paste(spaces, levels(factor(data[[vars[i]]])) ))))
   tbl
 }
+
+
+#' @export
+#' @rdname table_one
+p_cont_norm <- function(x,y) anova(lm(y~x))$`Pr(>F)`[1]
+#' @export
+#' @rdname table_one
+p_cont_nonnorm <- function(x,y) kruskal.test(x,y)$p.value
+#' @export
+#' @rdname table_one
+p_cat_exact <- function(x,y) fisher.test(x,y)$p.value
+#' @export
+#' @rdname table_one
+p_cat_apprx <- function(x,y) chisq.test(x,y)$p.value

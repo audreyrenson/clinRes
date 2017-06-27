@@ -2,6 +2,12 @@
 % Please edit documentation in R/table_one.R
 \name{table_one}
 \alias{table_one}
+\alias{cont_table}
+\alias{cat_table}
+\alias{p_cont_norm}
+\alias{p_cont_nonnorm}
+\alias{p_cat_exact}
+\alias{p_cat_apprx}
 \title{Produce formatted descriptives tables}
 \usage{
 table_one(vars, varlabels = vars, data, strata, normal = NULL,
@@ -11,12 +17,53 @@ table_one(vars, varlabels = vars, data, strata, normal = NULL,
   fun_p_fmt = p_fmt, measurelab_nonnormal = "Median [IQR]",
   measurelab_normal = "Mean±SD", measurelab_cat = "n (\%)", sep = " -- ",
   nspaces = 6)
+
+cont_table(vars, varlabels = vars, data, strata, normal = NULL,
+  fun_norm = mean_sd, fun_nonnorm = median_iqr, fun_norm_p = p_cont_norm,
+  fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt,
+  measurelab_nonnormal = "Median [IQR]", measurelab_normal = "Mean±SD",
+  sep = " -- ", ...)
+
+cat_table(vars, varlabels = vars, data, strata, exact = NULL,
+  fun_n_prc = n_perc, fun_apprx_p = p_cat_apprx,
+  fun_exact_p = p_cat_exact, fun_p_fmt = p_fmt, measurelab_cat = "n (\%)",
+  sep = " -- ", nspaces = 6, ...)
+
+p_cont_norm(x, y)
+
+p_cont_nonnorm(x, y)
+
+p_cat_exact(x, y)
+
+p_cat_apprx(x, y)
 }
 \arguments{
 \item{vars}{Character vector. The column names of variables to summarize.}
 
+\item{data}{Data.frame in which to look for variables.}
+
+\item{strata}{Character. Stratifying variable.}
+
+\item{normal}{Character vector. Variables to treat as normally distributed. If not included in this, numeric variables are considered non-normal.}
+
+\item{exact}{Character vector. Variable to perform exact tests on.}
+
+\item{fun_n_prc, fun_norm, fun_nonnorm}{Summary measure functions.}
+
+\item{fun_apprx_p, fun_exact_p, fun_norm_p, fun_nonnorm_p}{P-value functions.}
+
+\item{measurelab_nonnormal, measurelab_normal, measurelab_cat}{Character. Text to put in the row indicating how the variable is summarized.}
+
+\item{sep}{Character. Text to separate the variable label from the measure label.}
+
+\item{nspaces}{Integer. Number of spaces to indent factor levels.}
+
+\item{x, y}{Variables for univariate p-value calculation. Within \code{table_one}, these work out to be \code{x=data[[strata]], y=data[[vars[i]]]}.}
+
 \item{varlables}{Character vector. The labels for variables in the returned table. Should be the same length as \code{var}.}
+
+\item{fun_p_fm}{Formatting function for p-values.}
 }
 \description{
-This function mirrors createTableOne, but allows for more customization.
+Theses functions mirror createTableOne, but allow for more customization.
 }

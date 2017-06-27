@@ -2,11 +2,20 @@
 % Please edit documentation in R/glm_table.R
 \name{glm_table}
 \alias{glm_table}
+\alias{fmt.glm_table}
 \title{Produce a formatted generalized linear model table}
 \usage{
 glm_table(fit, digits = 4, p.digits = digits + 1, se = "normal",
   intercept = FALSE, fmt = FALSE, fun_coef = if (fit$family$link \%in\%
   c("log", "logit")) exp else I, ...)
+
+fmt.glm_table(glm_tbl, tbl_colnames = c(colnames(glm_tbl)[1], "95\% CI",
+  "p-value"), tbl_rownames = rownames(glm_tbl), digits = 2,
+  p.digits = digits + 1, p_fmt = function(p)
+  format.pval(round(as.numeric(p), p.digits), eps = 0.001),
+  beta_fmt = function(b) format(as.numeric(b), digits = digits, nsmall =
+  digits), ci_fmt = function(col1, col2) paste0(beta_fmt(col1), " to ",
+  beta_fmt(col2)))
 }
 \arguments{
 \item{fit}{An glm fit object of class \code{glm}.}
