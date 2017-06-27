@@ -16,3 +16,16 @@ Imports:
   ggplot2,
   lsr
 RoxygenNote: 6.0.1
+Collate: 
+    'cramersV_matrix.R'
+    'ctrv.R'
+    'filter_levels.R'
+    'ggsurv.R'
+    'glm_coefs.R'
+    'glm_table.R'
+    'levels_to_drop.R'
+    'prettytable_autoindent.R'
+    'prettytable_functions.R'
+    'reg_autoindent.R'
+    'table_indents.R'
+    'table_one.R'
