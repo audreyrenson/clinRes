@@ -169,13 +169,6 @@ table_one <- function(vars, varlabels=vars, data, strata, normal=NULL, exact=NUL
   tbl
 }
 
-load("R/final.rda")
-load("R/gun.rda")
-table_one(vars=c("TEACHSTA","BEDSIZE","n_incidents"),data=fac )
-gun$work <- gun$OCCUPATION %in% levels(factor(gun$OCCUPATION))[1:13]
-table_one(vars=c("TEACHSTA","BEDSIZE","n_incidents"), strata="REGION", data=fac )
-table_one(vars="HEIGHT", strata="work",  data=gun)
-table_one(vars=c("HEIGHT","work"), strata="gun_type",  data=gun)
 
 
 fmt.glm_table <- function(glm_tbl, tbl_colnames = c(colnames(glm_tbl)[1], "95% CI", "p-value"),

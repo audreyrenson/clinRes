@@ -1,15 +1,11 @@
-#' @export
+#' Produce a formatted generalized linear model table
 #'
-#' Produce publication-ready tables from glm objects.
+#' This function returns a formatted table of generalized linear model results.
 #'
 #' @param fit An glm fit object of class \code{glm}.
 #' @param digits Integer. The number of significant digits to return in coefficients
 #' @param p.digits Integer. The numeric of significant digits to return in p-values
-#' @param se Character. The type of standard error to use.
-#' #' \describe{
-#'   \item{normal}{Asymptotic normal standard errors, as used by \code{confint}.}
-#'   \item{robust}{Robust sandwich standard errors, as implemented in package \code{sandwich}}
-#' }
+#' @param se Character. The type of standard error to use, "normal" or "robust".
 #' @param intercept Logical. Whether or not to include the intercept row in the returned table.
 #' @param fmt Logical. If true, passes the returned table to \code{fmt.glm_table}, returning a publication-ready table.
 #' @param fun_coef Function to apply to the coefficients. By default, \code{exp} if link is "log" or "logit", otherwise identity.
@@ -29,8 +25,11 @@
 #'
 #' ## Get a nicely formatted table
 #' glm_table(fit, fmt=TRUE)
-#'
-#'
+
+
+#' @export
+
+
 glm_table <- function(fit, digits=4, p.digits=digits+1, se="normal", intercept=FALSE, fmt=FALSE,
                       fun_coef = if(fit$family$link %in% c("log","logit")) exp else I,
                       ...) {
