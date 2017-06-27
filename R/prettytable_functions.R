@@ -78,7 +78,7 @@ range_fmt <- iqr_fmt
 # p_value calculations for table_one
 
 p_cont_norm <- function(x,y) anova(lm(y~x))$`Pr(>F)`[1]
-p_cont_nonnorm <- function(x,y) kruskal.test(y~x)$p.value
+p_cont_nonnorm <- function(x,y) kruskal.test(x,y)$p.value
 p_cat_exact <- function(x,y) fisher.test(x,y)$p.value
 p_cat_apprx <- function(x,y) chisq.test(x,y)$p.value
 
@@ -98,12 +98,12 @@ cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
 
   if(missing(strata)) {
     #if there is no strata variable, this is just one column and no p-value
-    tbl <- t(t(sapply(1:nvars, function(i) funs[[i]](data[,vars[i]]))  ))
+    tbl <- t(t(sapply(1:nvars, function(i) funs[[i]](data[[vars[i]]]))  ))
 
   } else {
     #otherwise, it is a matrix with ncol=nlevels(strata) and an appropriate p value for var[i]
-    tbl <- t(sapply(1:nvars, function(i) funs[[i]](data[,vars[i]], data[,strata] )  ))
-    tbl <- cbind(tbl, p=sapply(1:nvars, function(i) fun_p_fmt(p_funs[[i]](data[,strata],data[,vars[i]]))))
+    tbl <- t(sapply(1:nvars, function(i) funs[[i]](data[[ vars[i] ]], data[[ strata ]] )  ))
+    tbl <- cbind(tbl, p=sapply(1:nvars, function(i) fun_p_fmt(p_funs[[i]](data[[strata]],data[[vars[i]]]))))
   }
   rownames(tbl) <- paste0(varlabels, sep, var_measures) #rownames will be the same either way
   tbl
@@ -112,25 +112,25 @@ cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
 cat_table <- function(vars, varlabels=vars, data, strata, exact=NULL,
                       fun_n_prc=n_perc,  fun_apprx_p=p_cat_apprx, fun_exact_p=p_cat_exact,
                       fun_p_fmt = p_fmt, measurelab_cat="n (%)",sep=" -- ", nspaces=6,...) {
-  ncols    = if(missing(strata)) 1 else nlevels(factor(data[,strata]))  #ncols doesn't include the p column for now
+  ncols    = if(missing(strata)) 1 else nlevels(factor(data[[strata]]))  #ncols doesn't include the p column for now
   nvars    = length(vars)
   blank_row= rep("", ncols)
   spaces = paste(rep("&nbsp;", nspaces), collapse = "")
 
   if(missing(strata)) {
     #first deal with the simplest case -- missing strata.
-    tbl      = t(t(as.character(sapply(1:nvars, function(i) c(blank_row, fun_n_prc(data[,vars[i]]))))))
+    tbl      = t(t(unlist(lapply(1:nvars, function(i) c(blank_row, fun_n_prc(data[[vars[i]]]))))))
   } else {
     p_funs   = lapply(1:nvars, function(i) if(vars[i] %in% exact) p_cat_exact else p_cat_apprx)
-    p_row    = t(sapply(1:nvars, function(i) c(blank_row, fun_p_fmt(p_funs[[i]](data[,vars[i]], data[,strata])))))
-    list_tbls= lapply(1:nvars, function(i) rbind(p_row[i,], cbind(fun_n_prc(data[,vars[i]], data[,strata]),"")))
+    p_row    = t(sapply(1:nvars, function(i) c(blank_row, fun_p_fmt(p_funs[[i]](data[[vars[i]]], data[[strata]])))))
+    list_tbls= lapply(1:nvars, function(i) rbind(p_row[i,], cbind(fun_n_prc(data[[vars[i]]], data[[strata]]),"")))
     tbl      = do.call(rbind, list_tbls)
     colnames(tbl)[ncol(tbl)] <- "p-value"
   }
 
   var_measure_labs <- paste0(varlabels, sep, measurelab_cat)
 
-  rownames(tbl) = unlist(lapply(1:nvars, function(i) c(var_measure_labs[i],paste(spaces, levels(factor(data[,vars[i]])) ))))
+  rownames(tbl) = unlist(lapply(1:nvars, function(i) c(var_measure_labs[i],paste(spaces, levels(factor(data[[vars[i]]])) ))))
   tbl
 }
 
@@ -167,12 +167,15 @@ table_one <- function(vars, varlabels=vars, data, strata, normal=NULL, exact=NUL
                       measurelab_normal=measurelab_normal, sep=sep)
   }
   tbl
-
 }
 
-
-#cat_table(vars=c("race_ethnicity","GENDER"), apprx=c("race_ethnicity", "GENDER"), strata="race_ethnicity", data=final )
-
+load("R/final.rda")
+load("R/gun.rda")
+table_one(vars=c("TEACHSTA","BEDSIZE","n_incidents"),data=fac )
+gun$work <- gun$OCCUPATION %in% levels(factor(gun$OCCUPATION))[1:13]
+table_one(vars=c("TEACHSTA","BEDSIZE","n_incidents"), strata="REGION", data=fac )
+table_one(vars="HEIGHT", strata="work",  data=gun)
+table_one(vars=c("HEIGHT","work"), strata="gun_type",  data=gun)
 
 
 fmt.glm_table <- function(glm_tbl, tbl_colnames = c(colnames(glm_tbl)[1], "95% CI", "p-value"),
