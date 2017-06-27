@@ -10,7 +10,7 @@
 #' @param fmt Logical. If true, passes the returned table to \code{fmt.glm_table}, returning a publication-ready table.
 #' @param fun_coef Function to apply to the coefficients. By default, \code{exp} if link is "log" or "logit", otherwise identity.
 #' @param ... Arguments passed to \code{fmt.glm_table}.
-#' @return A matrix with coefficients, 95% confidence intervals, and p-values.
+#' @return A matrix with coefficients, 95\% confidence intervals, and p-values.
 #' @examples
 #' ## Basic logistic regression example
 #' n <- 50
