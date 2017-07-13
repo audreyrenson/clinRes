@@ -6,6 +6,7 @@
 #' @param margin Integer. 1=row percent, 2=column percent (default).
 #' @param na.rm Logical. Remove NAs from calculation or return NA if present.
 
+#' @export
 n_perc <- function(x, ag.by, fun_n=n_fmt, fun_prop=prop_fmt, margin=2) {
   #unlike the other functions, this returns a vector if ag.by is missing, otherwise a matrix
 
@@ -28,6 +29,7 @@ n_perc <- function(x, ag.by, fun_n=n_fmt, fun_prop=prop_fmt, margin=2) {
   return(result)
 }
 
+#' @export                     
 #' @rdname n_perc
 median_iqr <- function(x, ag.by, fun_median=median_fmt, fun_iqr=iqr_fmt,na.rm=TRUE) {
   getMedIQR <- function(x) paste0(fun_median(median(x, na.rm=na.rm)),
@@ -41,6 +43,7 @@ median_iqr <- function(x, ag.by, fun_median=median_fmt, fun_iqr=iqr_fmt,na.rm=TR
   return(result)
 }
 
+#' @export                     
 #' @rdname n_perc
 median_range <- function(x, ag.by, fun_median=median_fmt, fun_range=range_fmt, na.rm=TRUE) {
   getMedRange <- function(x) paste0(fun_median(median(x, na.rm=na.rm)),
@@ -54,6 +57,7 @@ median_range <- function(x, ag.by, fun_median=median_fmt, fun_range=range_fmt, n
   return(result)
 }
 
+#' @export                     
 #' @rdname n_perc
 mean_sd <- function(x, ag.by, fun_mean=mean_fmt, fun_sd=sd_fmt, na.rm=TRUE) {
 
