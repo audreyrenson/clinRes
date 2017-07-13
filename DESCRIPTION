@@ -30,7 +30,7 @@ Collate:
     'quantileCuts.R'
     'reg_autoindent.R'
     'riskScoring.R'
-    'summary_measures2.R'
+    'summary_measures.R'
     'table1_varlabs.R'
     'table_indents.R'
     'table_one.R'
