@@ -27,7 +27,7 @@ cont_table(vars, varlabels = vars, data, strata, normal = NULL,
 cat_table(vars, varlabels = vars, data, strata, exact = NULL,
   fun_n_prc = n_perc, fun_apprx_p = p_cat_apprx,
   fun_exact_p = p_cat_exact, fun_p_fmt = p_fmt, measurelab_cat = "n (\%)",
-  sep = " -- ", nspaces = 6, ...)
+  sep = " -- ", nspaces = 6, all_levels = FALSE, ...)
 
 p_cont_norm(x, y)
 

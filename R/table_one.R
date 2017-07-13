@@ -85,26 +85,39 @@ cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
 #' @rdname table_one
 cat_table <- function(vars, varlabels=vars, data, strata, exact=NULL,
                       fun_n_prc=n_perc,  fun_apprx_p=p_cat_apprx, fun_exact_p=p_cat_exact,
-                      fun_p_fmt = p_fmt, measurelab_cat="n (%)",sep=" -- ", nspaces=6,...) {
+                      fun_p_fmt = p_fmt, measurelab_cat="n (%)",sep=" -- ", nspaces=6, all_levels=FALSE, ...) {
   ncols    = if(missing(strata)) 1 else nlevels(factor(data[[strata]]))  #ncols doesn't include the p column for now
   nvars    = length(vars)
   blank_row= rep("", ncols)
   spaces = paste(rep("&nbsp;", nspaces), collapse = "")
+  dat      = as.data.frame(lapply(data[c(vars, strata)], as.factor))
+  nlines   = sapply(vars, function(o) nlevels(data[[o]])+1)
+             if(!all_levels) nlines[nlines==3] <- 1
 
   if(missing(strata)) {
     #first deal with the simplest case -- missing strata.
-    tbl      = t(t(unlist(lapply(1:nvars, function(i) c(blank_row, fun_n_prc(data[[vars[i]]]))))))
+    if(!all_levels & 2 %in% sapply(dat[[vars]], nlevels)) {
+           row_function = function(i) fun_n_prc(dat[[vars[i]]])[2]
+    } else row_function = function(i) c(blank_row, fun_n_prc(dat[[vars[i]]]))
+      tbl      = t(t(unlist(lapply(1:nvars, row_function))))
   } else {
-    p_funs   = lapply(1:nvars, function(i) if(vars[i] %in% exact) p_cat_exact else p_cat_apprx)
-    p_row    = t(sapply(1:nvars, function(i) c(blank_row, fun_p_fmt(p_funs[[i]](data[[vars[i]]], data[[strata]])))))
-    list_tbls= lapply(1:nvars, function(i) rbind(p_row[i,], cbind(fun_n_prc(data[[vars[i]]], data[[strata]]),"")))
+    p_funs   = lapply(1:nvars, function(i) if(vars[i] %in% exact) fun_exact_p else fun_apprx_p)
+    p_row    = t(sapply(1:nvars, function(i) c(blank_row, fun_p_fmt(p_funs[[i]](dat[[vars[i]]], dat[[strata]])))))
+
+    if(!all_levels & 2 %in% sapply(dat[[vars]], nlevels)) {
+            tbl_function = function(i) c(fun_n_prc(dat[[vars[i]]], dat[[strata]])[2,], p_row[i,ncol(p_row)])
+    } else {
+            tbl_function = function(i)  rbind(p_row[i,], cbind(fun_n_prc(dat[[vars[i]]], dat[[strata]]),""))
+    }
+
+    list_tbls= lapply(1:nvars, tbl_function)
     tbl      = do.call(rbind, list_tbls)
     colnames(tbl)[ncol(tbl)] <- "p-value"
   }
 
   var_measure_labs <- paste0(varlabels, sep, measurelab_cat)
-
-  rownames(tbl) = unlist(lapply(1:nvars, function(i) c(var_measure_labs[i],paste(spaces, levels(factor(data[[vars[i]]])) ))))
+  #
+  # rownames(tbl) = unlist(lapply(1:nvars, function(i) c(var_measure_labs[i],paste(spaces, levels(factor(data[[vars[i]]])) ))))
   tbl
 }
 

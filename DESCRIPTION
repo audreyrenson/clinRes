@@ -17,6 +17,7 @@ Imports:
   lsr
 RoxygenNote: 6.0.1
 Collate: 
+    'commaList.R'
     'cramersV_matrix.R'
     'ctrv.R'
     'filter_levels.R'
@@ -26,7 +27,11 @@ Collate:
     'glm_table.R'
     'levels_to_drop.R'
     'prettytable_autoindent.R'
+    'quantileCuts.R'
     'reg_autoindent.R'
+    'riskScoring.R'
     'summary_measures.R'
+    'summary_measures2.R'
+    'table1_varlabs.R'
     'table_indents.R'
     'table_one.R'
