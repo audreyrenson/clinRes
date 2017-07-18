@@ -19,14 +19,14 @@ ci_RR_fmt <- function(lwr, upr, sep=" to ") paste0(RR_fmt(lwr), sep, RR_fmt(upr)
 #p values
 #' @export
 #' @rdname beta_fmt
-p_fmt <- function(p) format.pval(round(p,3), eps = .001)
+p_fmt <- function(p, eps=.001, digits=3) if(p<eps) paste0("<",eps) else format(p, digits=digits, nsmall=digits)
 #unvariate statistics
 #' @export
 #' @rdname beta_fmt
 prop_fmt <- function(x) paste0(" (",formatC(x*100, digits=1, width = 4, format="f"),"%)")
 #' @export
 #' @rdname beta_fmt
-sd_fmt <- function(x) paste0("±", formatC(x, digits=1, width=3, format="f"))
+sd_fmt <- function(x) paste0("&plusmn;", mean_fmt(x))
 #' @export
 #' @rdname beta_fmt
 mean_fmt <- function(x) formatC(x, digits=1, width=4, format="f")
