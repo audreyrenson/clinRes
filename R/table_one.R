@@ -24,8 +24,8 @@ table_one <- function(vars, varlabels=vars, data, strata, normal=NULL, exact=NUL
                       fun_n_prc=n_perc,  fun_apprx_p=p_cat_apprx, fun_exact_p=p_cat_exact,
                       fun_norm=mean_sd, fun_nonnorm=median_iqr,  fun_norm_p=p_cont_norm,
                       fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt,
-                      measurelab_nonnormal="Median [IQR]", measurelab_normal="Mean±SD",
-                      measurelab_cat="n (%)", sep=" -- ", nspaces=6) {
+                      measurelab_nonnormal="Median [IQR]", measurelab_normal="Mean&plusmn;SD",
+                      measurelab_cat="n (%)", sep=" -- ", nspaces=6, header=NULL) {
 
   is_cat    = sapply(data[vars], function(i) class(i) %in% c("logical","character","factor"))
 
@@ -35,21 +35,21 @@ table_one <- function(vars, varlabels=vars, data, strata, normal=NULL, exact=NUL
                  fun_norm=fun_norm, fun_nonnorm=fun_nonnorm,  fun_norm_p=fun_norm_p,
                  fun_nonnorm_p = fun_nonnorm_p, fun_p_fmt = fun_p_fmt,
                  measurelab_nonnormal=measurelab_nonnormal,
-                 measurelab_normal=measurelab_normal, sep=sep),
+                 measurelab_normal=measurelab_normal, sep=sep, header=header),
       cat_table(vars=vars[is_cat], varlabels=varlabels[is_cat], data=data, strata=strata, exact=exact,
                 all_levels=all_levels, fun_n_prc=fun_n_prc,  fun_apprx_p=fun_apprx_p, fun_exact_p=fun_exact_p,
-                fun_p_fmt = fun_p_fmt, measurelab_cat=measurelab_cat,sep=sep, nspaces=nspaces)
+                fun_p_fmt = fun_p_fmt, measurelab_cat=measurelab_cat,sep=sep, nspaces=nspaces, header=header)
     )
   } else if(any(is_cat)) {
     tbl <-  cat_table(vars[is_cat], varlabels=varlabels[is_cat], data=data, strata=strata, exact=exact,
                       all_levels=all_levels, fun_n_prc=fun_n_prc,  fun_apprx_p=fun_apprx_p, fun_exact_p=fun_exact_p,
-                      fun_p_fmt = fun_p_fmt, measurelab_cat=measurelab_cat,sep=sep, nspaces=nspaces)
+                      fun_p_fmt = fun_p_fmt, measurelab_cat=measurelab_cat,sep=sep, nspaces=nspaces, header=header)
   } else {
     tbl <- cont_table(vars[!is_cat], varlabels=varlabels[!is_cat], data=data, strata=strata, normal=normal,
                       fun_norm=fun_norm, fun_nonnorm=fun_nonnorm,  fun_norm_p=fun_norm_p,
                       fun_nonnorm_p = fun_nonnorm_p, fun_p_fmt = fun_p_fmt,
                       measurelab_nonnormal=measurelab_nonnormal,
-                      measurelab_normal=measurelab_normal, sep=sep)
+                      measurelab_normal=measurelab_normal, sep=sep, header=header)
   }
   tbl
 }
@@ -61,7 +61,8 @@ cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
                        fun_norm=mean_sd, fun_nonnorm=median_iqr,  fun_norm_p=p_cont_norm,
                        fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt,
                        measurelab_nonnormal="Median [IQR]",
-                       measurelab_normal="Mean±SD", sep=" -- ",...) {
+                       measurelab_normal="Mean±SD", sep=" -- ",
+                       header=NULL, ...) {
 
   nvars <- length(vars)
   funs <- lapply(vars, function(i) if(i %in% normal) fun_norm else fun_nonnorm)  #get a list of measure functions to go with each variable
@@ -71,13 +72,17 @@ cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
   if(missing(strata)) {
     #if there is no strata variable, this is just one column and no p-value
     tbl <- t(t(sapply(1:nvars, function(i) funs[[i]](data[[vars[i]]]))  ))
+    colnames(tbl) =  if(is.null(header)) "Overall" else header
 
   } else {
     #otherwise, it is a matrix with ncol=nlevels(strata) and an appropriate p value for var[i]
     tbl <- t(sapply(1:nvars, function(i) funs[[i]](data[[ vars[i] ]], data[[ strata ]] )  ))
     tbl <- cbind(tbl, p=sapply(1:nvars, function(i) fun_p_fmt(p_funs[[i]](data[[strata]],data[[vars[i]]]))))
+    colnames(tbl)[ncol(tbl)] <- "P-value"
+    if(!is.null(header)) colnames(tbl) = header
   }
   rownames(tbl) <- paste0(varlabels, sep, var_measures) #rownames will be the same either way
+
   tbl
 }
 
@@ -85,7 +90,7 @@ cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
 #' @rdname table_one
 cat_table <- function(vars, varlabels=vars, data, strata, all_levels=FALSE, exact=NULL,
                       fun_n_prc=n_perc,  fun_apprx_p=p_cat_apprx, fun_exact_p=p_cat_exact,
-                      fun_p_fmt = p_fmt, measurelab_cat="n (%)",sep=" -- ", nspaces=6,...) {
+                      fun_p_fmt = p_fmt, measurelab_cat="n (%)",sep=" -- ", nspaces=6,header=NULL,...) {
   ncols    = if(missing(strata)) 1 else nlevels(factor(data[[strata]]))  #ncols doesn't include the p column for now
   nvars    = length(vars)
   nlevs    = sapply(vars, function(i) nlevels(data[[i]]))
@@ -96,6 +101,7 @@ cat_table <- function(vars, varlabels=vars, data, strata, all_levels=FALSE, exac
     #first deal with the simplest case -- missing strata.
     tbl      = t(t(unlist(lapply(1:nvars, function(i)
       if(nlevs[i]==2 & !all_levels) fun_n_prc(data[[vars[i]]])[2] else c(blank_row, fun_n_prc(data[[vars[i]]]))))))
+    colnames(tbl) = if(is.null(header)) "Overall" else header
   } else {
 
     p_funs   = lapply(1:nvars, function(i) if(vars[i] %in% exact) p_cat_exact else p_cat_apprx)
@@ -110,7 +116,8 @@ cat_table <- function(vars, varlabels=vars, data, strata, all_levels=FALSE, exac
       }
     }
       tbl      = do.call(rbind, list_tbls)
-      colnames(tbl)[ncol(tbl)] <- "p-value"
+      colnames(tbl)[ncol(tbl)] <- "P-value"
+      if(!is.null(header)) colnames(tbl) = header
 
   }
 
@@ -121,6 +128,9 @@ cat_table <- function(vars, varlabels=vars, data, strata, all_levels=FALSE, exac
   rownames(tbl) = unlist(lapply(1:nvars, function(i)
     if(nlevs[i]==2 & !all_levels)  paste(var_measure_labs[i]) else c(var_measure_labs[i],paste(
     spaces, levels(factor(data[[vars[i]]])) ))))
+
+  colnames(tbl) = header
+
   tbl
 }
 
