@@ -23,7 +23,7 @@ RR_fmt(RR)
 
 ci_RR_fmt(lwr, upr, sep = " to ")
 
-p_fmt(p)
+p_fmt(p, eps = 0.001, digits = 3)
 
 prop_fmt(x)
 
