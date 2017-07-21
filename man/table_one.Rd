@@ -10,11 +10,11 @@
 \alias{p_cat_apprx}
 \title{Produce formatted descriptives tables}
 \usage{
-table_one(vars, varlabels = vars, data, strata, normal = NULL,
-  exact = NULL, all_levels = FALSE, fun_n_prc = n_perc,
+table_one(vars = names(data), varlabels = vars, data, strata,
+  normal = NULL, exact = NULL, all_levels = FALSE, fun_n_prc = n_perc,
   fun_apprx_p = p_cat_apprx, fun_exact_p = p_cat_exact,
   fun_norm = mean_sd, fun_nonnorm = median_iqr, fun_norm_p = p_cont_norm,
-  fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt,
+  fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt, fun_n_fmt = n_fmt,
   measurelab_nonnormal = "Median [IQR]",
   measurelab_normal = "Mean&plusmn;SD", measurelab_cat = "n (\%)",
   sep = " -- ", nspaces = 6, header = NULL)
