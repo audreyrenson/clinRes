@@ -4,6 +4,7 @@
 \alias{table_one}
 \alias{cont_table}
 \alias{cat_table}
+\alias{table_one.rgroup}
 \alias{p_cont_norm}
 \alias{p_cont_nonnorm}
 \alias{p_cat_exact}
@@ -29,6 +30,8 @@ cat_table(vars, varlabels = vars, data, strata, all_levels = FALSE,
   exact = NULL, fun_n_prc = n_perc, fun_apprx_p = p_cat_apprx,
   fun_exact_p = p_cat_exact, fun_p_fmt = p_fmt, measurelab_cat = "n (\%)",
   sep = " -- ", nspaces = 6, header = NULL, ...)
+
+table_one.rgroup(tbl, indices, labels, nspaces = 6)
 
 p_cont_norm(x, y)
 
@@ -59,11 +62,17 @@ p_cat_apprx(x, y)
 
 \item{nspaces}{Integer. Number of spaces to indent factor levels.}
 
+\item{tbl}{Matrix object returned by \code{table_one()}.}
+
+\item{labels}{Headings for row groups.}
+
 \item{x, y}{Variables for univariate p-value calculation. Within \code{table_one}, these work out to be \code{x=data[[strata]], y=data[[vars[i]]]}.}
 
 \item{varlables}{Character vector. The labels for variables in the returned table. Should be the same length as \code{var}.}
 
 \item{fun_p_fm}{Formatting function for p-values.}
+
+\item{incides}{List of indices representing the row groups.}
 }
 \description{
 Theses functions mirror createTableOne, but allow for more customization.

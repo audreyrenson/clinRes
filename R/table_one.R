@@ -96,7 +96,8 @@ cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
 cat_table <- function(vars, varlabels=vars, data, strata, all_levels=FALSE, exact=NULL,
                       fun_n_prc=n_perc,  fun_apprx_p=p_cat_apprx, fun_exact_p=p_cat_exact,
                       fun_p_fmt = p_fmt, measurelab_cat="n (%)",sep=" -- ", nspaces=6,header=NULL,...) {
-  ncols    = if(missing(strata)) 1 else nlevels(factor(data[[strata]]))  #ncols doesn't include the p column for now
+  data     = as.data.frame(lapply(data, as.factor))
+  ncols    = if(missing(strata)) 1 else nlevels(data[[strata]])  #ncols doesn't include the p column for now
   nvars    = length(vars)
   nlevs    = sapply(vars, function(i) nlevels(data[[i]]))
   blank_row= rep("", ncols)
@@ -139,6 +140,19 @@ cat_table <- function(vars, varlabels=vars, data, strata, all_levels=FALSE, exac
   tbl
 }
 
+#' @export
+#' @rdname table_one
+#' @param  incides List of indices representing the row groups.
+#' @param  labels  Headings for row groups.
+#' @param  tbl     Matrix object returned by \code{table_one()}.
+table_one.rgroup <- function(tbl, indices, labels, nspaces=6) {
+  for(i in seq_along(labels)) {
+    tbl <- miscTools::insertRow(m=tbl, r = indices[[i]][1], v = "", rName = labels[i])
+    tbl <- table_indents(tbl, index=indices[[i]]+1, nspaces=nspaces)
+    if(i<length(labels))  indices[[i+1]] <- indices[[i+1]] + 1
+  }
+  tbl
+}
 
 #' @export
 #' @rdname table_one
