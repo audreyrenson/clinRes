@@ -7,6 +7,8 @@
 #' @param na.rm Logical. Remove NAs from calculation or return NA if present.
 
 #' @export
+#' @include formatting_functions.R
+
 n_perc <- function(x, ag.by, fun_n=n_fmt, fun_prop=prop_fmt, margin=2) {
   #unlike the other functions, this returns a vector if ag.by is missing, otherwise a matrix
 

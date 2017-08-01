@@ -32,7 +32,7 @@ sd_fmt <- function(x) paste0("&plusmn;", mean_fmt(x))
 mean_fmt <- function(x) formatC(x, digits=1, width=4, format="f")
 #' @export
 #' @rdname beta_fmt
-n_fmt <- function(x) formatC(x, width=5, format="d")
+n_fmt <- function(x) formatC(prettyNum(x, big.mark = ","), width=5, format="d")
 #' @export
 #' @rdname beta_fmt
 median_fmt <- function(x) formatC(x, digits=1, width=4, format="f")
