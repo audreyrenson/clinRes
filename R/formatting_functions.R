@@ -19,7 +19,7 @@ ci_RR_fmt <- function(lwr, upr, sep=" to ") paste0(RR_fmt(lwr), sep, RR_fmt(upr)
 #p values
 #' @export
 #' @rdname beta_fmt
-p_fmt <- function(p, digits=3, eps=10^-digits) if(p<eps) paste0("<",eps) else formatC(format(p, digits=0, nsmall=digits), width=digits+3, format="f")
+p_fmt <- function(p, digits=3, eps=10^-digits) ifelse(p<eps, paste0("<",eps), formatC(format(p, digits=0, nsmall=digits), width=digits+3, format="f"))
 #unvariate statistics
 #' @export
 #' @rdname beta_fmt
