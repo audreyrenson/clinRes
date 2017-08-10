@@ -28,7 +28,7 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
                       measurelab_cat="n (%)", sep=" -- ", nspaces=6, header=NULL) {
 
   #first, get total row
-  n         = fun_n_fmt( if(missing(strata)) nrow(data) else c( table(data[[strata]]), "") )
+  n         = fun_n_fmt( if(missing(strata)) nrow(data) else c( table(data[[strata]]), "P-value"="") )
 
   is_cat    = sapply(data[vars], function(i) class(i) %in% c("logical","character","factor"))
 
