@@ -16,20 +16,20 @@ table_one(vars = names(data), varlabels = vars, data, strata,
   fun_apprx_p = p_cat_apprx, fun_exact_p = p_cat_exact,
   fun_norm = mean_sd, fun_nonnorm = median_iqr, fun_norm_p = p_cont_norm,
   fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt, fun_n_fmt = n_fmt,
-  measurelab_nonnormal = "Median [IQR]",
-  measurelab_normal = "Mean&plusmn;SD", measurelab_cat = "n (\%)",
-  sep = " -- ", nspaces = 6, header = NULL)
+  measurelab_nonnormal = ", median [IQR]",
+  measurelab_normal = ", mean&plusmn;SD", measurelab_cat = " (\%)",
+  sep = "", nspaces = 6, header = NULL, groups = NULL)
 
 cont_table(vars, varlabels = vars, data, strata, normal = NULL,
   fun_norm = mean_sd, fun_nonnorm = median_iqr, fun_norm_p = p_cont_norm,
   fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt,
-  measurelab_nonnormal = "Median [IQR]", measurelab_normal = "Mean±SD",
-  sep = " -- ", header = NULL, ...)
+  measurelab_nonnormal = ", median [IQR]",
+  measurelab_normal = ", mean&plusmn;SD", sep = "", header = NULL, ...)
 
 cat_table(vars, varlabels = vars, data, strata, all_levels = FALSE,
   exact = NULL, fun_n_prc = n_perc, fun_apprx_p = p_cat_apprx,
-  fun_exact_p = p_cat_exact, fun_p_fmt = p_fmt, measurelab_cat = "n (\%)",
-  sep = " -- ", nspaces = 6, header = NULL, ...)
+  fun_exact_p = p_cat_exact, fun_p_fmt = p_fmt, measurelab_cat = " (\%)",
+  sep = "", nspaces = 6, header = NULL, ...)
 
 table_one.rgroup(tbl, indices, labels, nspaces = 6)
 
@@ -61,6 +61,8 @@ p_cat_apprx(x, y)
 \item{sep}{Character. Text to separate the variable label from the measure label.}
 
 \item{nspaces}{Integer. Number of spaces to indent factor levels.}
+
+\item{groups}{List of vectors whose elements are the names of variables in each group, and the list names are the names of the groups.}
 
 \item{tbl}{Matrix object returned by \code{table_one()}.}
 

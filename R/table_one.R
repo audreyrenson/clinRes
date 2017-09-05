@@ -15,7 +15,7 @@
 #' @param measurelab_nonnormal,measurelab_normal,measurelab_cat Character. Text to put in the row indicating how the variable is summarized.
 #' @param sep Character. Text to separate the variable label from the measure label.
 #' @param nspaces Integer. Number of spaces to indent factor levels.
-
+#' @param groups List of vectors whose elements are the names of variables in each group, and the list names are the names of the groups.
 #' @include summary_measures.R
 #' @include formatting_functions.R
 
@@ -25,7 +25,7 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
                       fun_norm=mean_sd, fun_nonnorm=median_iqr,  fun_norm_p=p_cont_norm,
                       fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt, fun_n_fmt = n_fmt,
                       measurelab_nonnormal=", median [IQR]", measurelab_normal=", mean&plusmn;SD",
-                      measurelab_cat=" (%)", sep="", nspaces=6, header=NULL) {
+                      measurelab_cat=" (%)", sep="", nspaces=6, header=NULL, groups=NULL) {
 
   #first, get total row
   n         = fun_n_fmt( if(missing(strata)) nrow(data) else c( table(data[[strata]]), "P-value"="") )
@@ -56,6 +56,28 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
   }
 
   tbl <- rbind(n, tbl)
+
+  #add row groupings if specified
+  if(!is.null(groups)) {
+    for(i in 1:length(groups)) {
+      varlabs_gp <- varlabels[vars %in% groups[[i]]]
+      group_index <- unlist(sapply(varlabs_gp, function(j) grep(j, rownames(tbl))))
+      group_measure_lab <-  if(groups[[i]][1] %in% vars[is_cat]) measurelab_cat else if(groups[[i]][1] %in% normal) measurelab_normal else measurelab_nonnormal
+      group_lab <- paste0(names(groups)[i], group_measure_lab)
+      #first add the indents
+      tbl <- table_indents(tbl, index=group_index, nspaces = nspaces)
+      #add the blank group title row
+      tbl <- rbind(tbl[1:(min(group_index)-1),,drop=FALSE],
+                    "",
+                    tbl[min(group_index):nrow(tbl),,drop=FALSE])
+      #name the blank row
+      rownames(tbl)[min(group_index)] <- group_lab
+      #remove measure labs from grouped rows (is now +1 because added group title row)
+      gsub_measure_lab <- gsub("\\(","\\\\(", group_measure_lab)
+      rownames(tbl)[group_index + 1] <- gsub(gsub_measure_lab, "", rownames(tbl)[group_index + 1])
+    }
+  }
+
   tbl
 }
 
