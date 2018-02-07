@@ -30,6 +30,11 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
                       measurelab_nonnormal=", median [IQR]", measurelab_normal=", mean&plusmn;SD",
                       measurelab_cat=" (%)", sep="", nspaces=6, header=NULL, groups=NULL,
                       includeNA=NULL, NAlabel="Missing (%)") {
+  #checks
+  if(!all(c(vars, strata) %in% names(data)))
+      stop(paste0("Variable '", paste(c(vars, strata)[!c(vars, strata) %in% names(data)], collapse = ", "), "' not in dataset."))
+  if(length(vars) != length(varlabels)) stop("vars and varlabels must be the same length.")
+
 
   #first, get total row
   n         = fun_n_fmt( if(missing(strata)) nrow(data) else c( table(data[[strata]]), "P-value"="") )
@@ -39,7 +44,7 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
   #convert all categorical to factor
   data[,vars[is_cat]] = lapply(data[,vars[is_cat]], factor)
   #including strata
-  data[[strata]] = factor(data[[strata]])
+  if(!missing(strata)) data[[strata]] = factor(data[[strata]])
   #include NA as a level if includeNA = TRUE
   if("cat" %in% includeNA) data[,vars[is_cat]] = lapply(data[,vars[is_cat]], addNAlevel, NAlabel=NAlabel)
 
@@ -223,6 +228,7 @@ getNAs <- function(x, strata) {
   if(any(is.na(x))) {
     if(missing(strata)) n_perc(is.na(x))["TRUE"] else n_perc(is.na(x), strata)["TRUE",]
   } else {
+    if(missing(strata)) strata=1
     getNoNAs_n_perc(strata)
   }
 }
