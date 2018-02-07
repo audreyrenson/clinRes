@@ -33,9 +33,10 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
 
   is_cat    = sapply(data[vars], function(i) class(i) %in% c("logical","character","factor"))
 
-  #convert all categorical to factor and include NA as a level
+  #convert all categorical to factor
   data[,vars[is_cat]] = lapply(data[,vars[is_cat]], factor)
-  data[,vars[is_cat]] = lapply(data[,vars[is_cat]], addNA, ifany=TRUE)
+  #include NA as a level if includeNA = TRUE
+  if(includeNA) data[,vars[is_cat]] = lapply(data[,vars[is_cat]], addNA, ifany=TRUE)
 
 
   if(any(is_cat) & any(!is_cat)) {
