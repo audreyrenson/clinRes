@@ -16,6 +16,8 @@
 #' @param sep Character. Text to separate the variable label from the measure label.
 #' @param nspaces Integer. Number of spaces to indent factor levels.
 #' @param groups List of vectors whose elements are the names of variables in each group, and the list names are the names of the groups.
+#' @param includeNA Logical. Whether or not to show the n (%) of NA's for each variable.
+#' @param NAlabel Character. Row label for NA rows.
 #' @include summary_measures.R
 #' @include formatting_functions.R
 
@@ -26,7 +28,7 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
                       fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt, fun_n_fmt = n_fmt,
                       measurelab_nonnormal=", median [IQR]", measurelab_normal=", mean&plusmn;SD",
                       measurelab_cat=" (%)", sep="", nspaces=6, header=NULL, groups=NULL,
-                      includeNA=TRUE) {
+                      includeNA=TRUE, NAlabel="Missing (%)") {
 
   #first, get total row
   n         = fun_n_fmt( if(missing(strata)) nrow(data) else c( table(data[[strata]]), "P-value"="") )
@@ -36,7 +38,7 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
   #convert all categorical to factor
   data[,vars[is_cat]] = lapply(data[,vars[is_cat]], factor)
   #include NA as a level if includeNA = TRUE
-  if(includeNA) data[,vars[is_cat]] = lapply(data[,vars[is_cat]], addNA, ifany=TRUE)
+  if(includeNA) data[,vars[is_cat]] = lapply(data[,vars[is_cat]], addNAlevel, NAlabel=NAlabel)
 
 
   if(any(is_cat) & any(!is_cat)) {
@@ -45,7 +47,8 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
                  fun_norm=fun_norm, fun_nonnorm=fun_nonnorm,  fun_norm_p=fun_norm_p,
                  fun_nonnorm_p = fun_nonnorm_p, fun_p_fmt = fun_p_fmt,
                  measurelab_nonnormal=measurelab_nonnormal, nspaces=nspaces,
-                 measurelab_normal=measurelab_normal, sep=sep, header=header, includeNA=includeNA),
+                 measurelab_normal=measurelab_normal, sep=sep, header=header,
+                 includeNA=includeNA, NAlabel=NAlabel),
       cat_table(vars=vars[is_cat], varlabels=varlabels[is_cat], data=data, strata=strata, exact=exact,
                 all_levels=all_levels, fun_n_prc=fun_n_prc,  fun_apprx_p=fun_apprx_p, fun_exact_p=fun_exact_p,
                 fun_p_fmt = fun_p_fmt, measurelab_cat=measurelab_cat,sep=sep, nspaces=nspaces, header=header)
@@ -59,7 +62,8 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
                       fun_norm=fun_norm, fun_nonnorm=fun_nonnorm,  fun_norm_p=fun_norm_p,
                       fun_nonnorm_p = fun_nonnorm_p, fun_p_fmt = fun_p_fmt,
                       measurelab_nonnormal=measurelab_nonnormal, nspaces=nspaces,
-                      measurelab_normal=measurelab_normal, sep=sep, header=header, includeNA=includeNA)
+                      measurelab_normal=measurelab_normal, sep=sep, header=header,
+                      includeNA=includeNA, NAlabel=NAlabel)
   }
 
   tbl <- rbind(n, tbl)
@@ -96,7 +100,8 @@ cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
                        fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt,
                        measurelab_nonnormal=", median [IQR]",
                        measurelab_normal=", mean&plusmn;SD", sep="",
-                       nspaces=6,  header=NULL, includeNA=TRUE, ...) {
+                       nspaces=6,  header=NULL,
+                       includeNA=TRUE, NAlabel="Missing (%)", ...) {
 
   nvars <- length(vars)
   funs <- lapply(vars, function(i) if(i %in% normal) fun_norm else fun_nonnorm)  #get a list of measure functions to go with each variable
@@ -128,7 +133,7 @@ cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
   }
   rownames(tbl) <- c(rbind(                   #rownames will be the same either way.
     paste0(varlabels, sep, var_measures),
-    paste0(spaces, "NA"))) #The c(rbind()) business is to intersperse "" for the NA rows.
+    paste0(spaces, NAlabel))) #The c(rbind()) business is to intersperse "" for the NA rows.
 
   if(includeNA==FALSE) tbl <- t(t(odd(tbl)))
 
@@ -216,3 +221,9 @@ getNAs <- function(x, strata) {
 }
 #function to get odd numbered rows of table to exclude NA rows
 odd <- function(tbl) tbl[ which( (1:nrow(tbl) %% 2) == 1), ]
+#function to add missing as a level
+addNAlevel <- function(x, NAlabel, ifany=TRUE) {
+  z <- addNA(factor(x), ifany = ifany)
+  levels(z)[is.na(levels(z))] <- NAlabel
+  z
+}
