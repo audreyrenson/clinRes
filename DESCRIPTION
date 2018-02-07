@@ -1,0 +1,38 @@
+Package: clinRes
+Title: Convenience functions for the NYU Lutheran Clinical Research Offic
+Version: 0.0.0.9000
+Authors@R: person("Renson", "Audrey", email = "audrey.renson@nyumc.org", role = c("aut", "cre"))
+Description: Create nice-looking table 1, regression tables, robust poisson regression, quick excel copy, etc.
+Depends: R (>= 3.3.2)
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+Imports:
+  dplyr,
+  mosaic,
+  reshape2,
+  tableone,
+  sandwich,
+  ggplot2,
+  lsr,
+  miscTools
+RoxygenNote: 6.0.1
+Collate: 
+    'commaList.R'
+    'cramersV_matrix.R'
+    'ctrv.R'
+    'filter_levels.R'
+    'formatting_functions.R'
+    'ggCheckLinear.R'
+    'ggroc.R'
+    'ggsurv.R'
+    'glm_coefs.R'
+    'glm_table.R'
+    'levels_to_drop.R'
+    'prettytable_autoindent.R'
+    'quantileCuts.R'
+    'reg_autoindent.R'
+    'summary_measures.R'
+    'table1_varlabs.R'
+    'table_indents.R'
+    'table_one.R'
