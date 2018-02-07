@@ -25,7 +25,8 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
                       fun_norm=mean_sd, fun_nonnorm=median_iqr,  fun_norm_p=p_cont_norm,
                       fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt, fun_n_fmt = n_fmt,
                       measurelab_nonnormal=", median [IQR]", measurelab_normal=", mean&plusmn;SD",
-                      measurelab_cat=" (%)", sep="", nspaces=6, header=NULL, groups=NULL) {
+                      measurelab_cat=" (%)", sep="", nspaces=6, header=NULL, groups=NULL,
+                      includeNA=TRUE) {
 
   #first, get total row
   n         = fun_n_fmt( if(missing(strata)) nrow(data) else c( table(data[[strata]]), "P-value"="") )
@@ -43,7 +44,7 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
                  fun_norm=fun_norm, fun_nonnorm=fun_nonnorm,  fun_norm_p=fun_norm_p,
                  fun_nonnorm_p = fun_nonnorm_p, fun_p_fmt = fun_p_fmt,
                  measurelab_nonnormal=measurelab_nonnormal, nspaces=nspaces,
-                 measurelab_normal=measurelab_normal, sep=sep, header=header),
+                 measurelab_normal=measurelab_normal, sep=sep, header=header, includeNA=includeNA),
       cat_table(vars=vars[is_cat], varlabels=varlabels[is_cat], data=data, strata=strata, exact=exact,
                 all_levels=all_levels, fun_n_prc=fun_n_prc,  fun_apprx_p=fun_apprx_p, fun_exact_p=fun_exact_p,
                 fun_p_fmt = fun_p_fmt, measurelab_cat=measurelab_cat,sep=sep, nspaces=nspaces, header=header)
@@ -57,7 +58,7 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
                       fun_norm=fun_norm, fun_nonnorm=fun_nonnorm,  fun_norm_p=fun_norm_p,
                       fun_nonnorm_p = fun_nonnorm_p, fun_p_fmt = fun_p_fmt,
                       measurelab_nonnormal=measurelab_nonnormal, nspaces=nspaces,
-                      measurelab_normal=measurelab_normal, sep=sep, header=header)
+                      measurelab_normal=measurelab_normal, sep=sep, header=header, includeNA=includeNA)
   }
 
   tbl <- rbind(n, tbl)
@@ -94,7 +95,7 @@ cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
                        fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt,
                        measurelab_nonnormal=", median [IQR]",
                        measurelab_normal=", mean&plusmn;SD", sep="",
-                       nspaces=6,  header=NULL, ...) {
+                       nspaces=6,  header=NULL, includeNA=TRUE, ...) {
 
   nvars <- length(vars)
   funs <- lapply(vars, function(i) if(i %in% normal) fun_norm else fun_nonnorm)  #get a list of measure functions to go with each variable
@@ -127,6 +128,8 @@ cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
   rownames(tbl) <- c(rbind(                   #rownames will be the same either way.
     paste0(varlabels, sep, var_measures),
     paste0(spaces, "NA"))) #The c(rbind()) business is to intersperse "" for the NA rows.
+
+  if(includeNA==FALSE) tbl <- t(t(odd(tbl)))
 
   tbl
 }
@@ -210,3 +213,5 @@ p_cat_apprx <- function(x,y) chisq.test(x,y)$p.value
 getNAs <- function(x, strata) {
   if(missing(strata)) n_perc(is.na(x))["TRUE"] else n_perc(is.na(x), strata)["TRUE",]
 }
+#function to get odd numbered rows of table to exclude NA rows
+odd <- function(tbl) tbl[ which( (1:nrow(tbl) %% 2) == 1), ]
