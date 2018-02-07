@@ -32,6 +32,11 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
 
   is_cat    = sapply(data[vars], function(i) class(i) %in% c("logical","character","factor"))
 
+  #convert all categorical to factor and include NA as a level
+  data[,vars[is_cat]] = lapply(data[,vars[is_cat]], factor)
+  data[,vars[is_cat]] = lapply(data[,vars[is_cat]], addNA, ifany=TRUE)
+
+
   if(any(is_cat) & any(!is_cat)) {
     tbl <- rbind(
       cont_table(vars=vars[!is_cat], varlabels=varlabels[!is_cat], data=data, strata=strata, normal=normal,
@@ -118,7 +123,6 @@ cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
 cat_table <- function(vars, varlabels=vars, data, strata, all_levels=FALSE, exact=NULL,
                       fun_n_prc=n_perc,  fun_apprx_p=p_cat_apprx, fun_exact_p=p_cat_exact,
                       fun_p_fmt = p_fmt, measurelab_cat=" (%)",sep="", nspaces=6,header=NULL,...) {
-  data     = as.data.frame(lapply(data, as.factor))
   ncols    = if(missing(strata)) 1 else nlevels(data[[strata]])  #ncols doesn't include the p column for now
   nvars    = length(vars)
   nlevs    = sapply(vars, function(i) nlevels(data[[i]]))
@@ -155,7 +159,7 @@ cat_table <- function(vars, varlabels=vars, data, strata, all_levels=FALSE, exac
 
   rownames(tbl) = unlist(lapply(1:nvars, function(i)
     if(nlevs[i]==2 & !all_levels)  paste(var_measure_labs[i]) else c(var_measure_labs[i],paste(
-    spaces, levels(factor(data[[vars[i]]])) ))))
+    spaces, levels(data[[vars[i]]]) ))))
 
   colnames(tbl) = header
 
