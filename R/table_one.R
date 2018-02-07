@@ -18,6 +18,7 @@
 #' @param groups List of vectors whose elements are the names of variables in each group, and the list names are the names of the groups.
 #' @param includeNA Character. Either "cont","cat", or c("cont","cat"). Whether or not to show the n (%) of NA's for continuous and categorical variables, respectively.
 #' @param NAlabel Character. Row label for NA rows.
+#'
 #' @include summary_measures.R
 #' @include formatting_functions.R
 
@@ -37,6 +38,8 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
 
   #convert all categorical to factor
   data[,vars[is_cat]] = lapply(data[,vars[is_cat]], factor)
+  #including strata
+  data[[strata]] = factor(data[[strata]])
   #include NA as a level if includeNA = TRUE
   if("cat" %in% includeNA) data[,vars[is_cat]] = lapply(data[,vars[is_cat]], addNAlevel, NAlabel=NAlabel)
 
@@ -125,7 +128,7 @@ cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
     tbl <- do.call(rbind, lapply(1:nvars, function(i)
       rbind(
         funs[[i]](data[[ vars[i] ]], data[[ strata ]] ),
-        getNAs(data[[ vars[i] ]], data[[ strata]])
+        getNAs(x = data[[ vars[i] ]], data[[ strata]])
       )))
     tbl <- cbind(tbl, p=c(sapply(1:nvars, function(i) c(fun_p_fmt(p_funs[[i]](data[[strata]],data[[vars[i]]])),""))))
     colnames(tbl)[ncol(tbl)] <- "P-value"
@@ -215,9 +218,17 @@ p_cat_exact <- function(x,y) fisher.test(x,y)$p.value
 #' @rdname table_one
 p_cat_apprx <- function(x,y) chisq.test(x,y)$p.value
 
-#function to get NAs for cont_table
+#functions to get NAs for cont_table
 getNAs <- function(x, strata) {
-  if(missing(strata)) n_perc(is.na(x))["TRUE"] else n_perc(is.na(x), strata)["TRUE",]
+  if(any(is.na(x))) {
+    if(missing(strata)) n_perc(is.na(x))["TRUE"] else n_perc(is.na(x), strata)["TRUE",]
+  } else {
+    getNoNAs_n_perc(strata)
+  }
+}
+#this is probably not ideal, but solves the problem that when there are no NAs, getNAs was returning an error.
+getNoNAs_n_perc <- function(strata) {
+  rep("    0 ( 0.0%)", nlevels(factor(strata)))
 }
 #function to get odd numbered rows of table to exclude NA rows
 odd <- function(tbl) tbl[ which( (1:nrow(tbl) %% 2) == 1), ]
