@@ -37,7 +37,7 @@ glm_robust_coefs.cluster <- function(fit,id) {
   tbl <- cbind(coef(fit),
                coef(fit) - 1.96 * std.err,
                coef(fit) + 1.96 * std.err,
-               2 * pnorm(abs(coef(fit)/std.err), lower.tail=FALSE))
+               2 * pnorm(-abs(coef(fit)/std.err), lower.tail=FALSE))
   
   tbl
 }
