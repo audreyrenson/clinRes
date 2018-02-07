@@ -42,7 +42,7 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
       cont_table(vars=vars[!is_cat], varlabels=varlabels[!is_cat], data=data, strata=strata, normal=normal,
                  fun_norm=fun_norm, fun_nonnorm=fun_nonnorm,  fun_norm_p=fun_norm_p,
                  fun_nonnorm_p = fun_nonnorm_p, fun_p_fmt = fun_p_fmt,
-                 measurelab_nonnormal=measurelab_nonnormal,
+                 measurelab_nonnormal=measurelab_nonnormal, nspaces=nspaces,
                  measurelab_normal=measurelab_normal, sep=sep, header=header),
       cat_table(vars=vars[is_cat], varlabels=varlabels[is_cat], data=data, strata=strata, exact=exact,
                 all_levels=all_levels, fun_n_prc=fun_n_prc,  fun_apprx_p=fun_apprx_p, fun_exact_p=fun_exact_p,
@@ -56,7 +56,7 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
     tbl <- cont_table(vars[!is_cat], varlabels=varlabels[!is_cat], data=data, strata=strata, normal=normal,
                       fun_norm=fun_norm, fun_nonnorm=fun_nonnorm,  fun_norm_p=fun_norm_p,
                       fun_nonnorm_p = fun_nonnorm_p, fun_p_fmt = fun_p_fmt,
-                      measurelab_nonnormal=measurelab_nonnormal,
+                      measurelab_nonnormal=measurelab_nonnormal, nspaces=nspaces,
                       measurelab_normal=measurelab_normal, sep=sep, header=header)
   }
 
@@ -94,26 +94,39 @@ cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
                        fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt,
                        measurelab_nonnormal=", median [IQR]",
                        measurelab_normal=", mean&plusmn;SD", sep="",
-                       header=NULL, ...) {
+                       nspaces=6,  header=NULL, ...) {
 
   nvars <- length(vars)
   funs <- lapply(vars, function(i) if(i %in% normal) fun_norm else fun_nonnorm)  #get a list of measure functions to go with each variable
   p_funs <- lapply(vars, function(i) if(i %in% normal) fun_norm_p else fun_nonnorm_p) #get a list of p functions
   var_measures <- ifelse(vars %in% normal , measurelab_normal, measurelab_nonnormal) #vector of measure label functions to paste onto the rownames
 
+  spaces = paste(rep("&nbsp;", nspaces), collapse = "") #this is only applicable to the NA rows
+
   if(missing(strata)) {
     #if there is no strata variable, this is just one column and no p-value
-    tbl <- t(t(sapply(1:nvars, function(i) funs[[i]](data[[vars[i]]]))  ))
+    tbl <- do.call(rbind, lapply(1:nvars, function(i)
+      rbind(
+        funs[[i]](data[[ vars[i] ]]), # <- this creates the row of the actual measure(s) (/and p-value)
+        getNAs(data[[ vars[i] ]]) # <- this creates the NA row
+      )))
+
     colnames(tbl) =  if(is.null(header)) "Overall" else header
 
   } else {
     #otherwise, it is a matrix with ncol=nlevels(strata) and an appropriate p value for var[i]
-    tbl <- t(sapply(1:nvars, function(i) funs[[i]](data[[ vars[i] ]], data[[ strata ]] )  ))
-    tbl <- cbind(tbl, p=sapply(1:nvars, function(i) fun_p_fmt(p_funs[[i]](data[[strata]],data[[vars[i]]]))))
+    tbl <- do.call(rbind, lapply(1:nvars, function(i)
+      rbind(
+        funs[[i]](data[[ vars[i] ]], data[[ strata ]] ),
+        getNAs(data[[ vars[i] ]], data[[ strata]])
+      )))
+    tbl <- cbind(tbl, p=c(sapply(1:nvars, function(i) c(fun_p_fmt(p_funs[[i]](data[[strata]],data[[vars[i]]])),""))))
     colnames(tbl)[ncol(tbl)] <- "P-value"
     if(!is.null(header)) colnames(tbl) = header
   }
-  rownames(tbl) <- paste0(varlabels, sep, var_measures) #rownames will be the same either way
+  rownames(tbl) <- c(rbind(                   #rownames will be the same either way.
+    paste0(varlabels, sep, var_measures),
+    paste0(spaces, "NA"))) #The c(rbind()) business is to intersperse "" for the NA rows.
 
   tbl
 }
@@ -192,3 +205,8 @@ p_cat_exact <- function(x,y) fisher.test(x,y)$p.value
 #' @export
 #' @rdname table_one
 p_cat_apprx <- function(x,y) chisq.test(x,y)$p.value
+
+#function to get NAs for cont_table
+getNAs <- function(x, strata) {
+  if(missing(strata)) n_perc(is.na(x))["TRUE"] else n_perc(is.na(x), strata)["TRUE",]
+}
