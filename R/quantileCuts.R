@@ -23,21 +23,21 @@ getOptimalCuts.boot <- function(formula, data, type="b", cp=0.01, R=1000) {
   }
 }
 
-boot.cutpoints <- function(data, formula, R=500, cp=0.02) {
-  cuts <- function(formula, data, indices, cp=cp) {
-    d <- data[indices,]
-    tr <- rpart::prune(rpart::rpart(formula, data=d), cp=cp)
-    cuts <- c(0, tr$splits[,"index"], Inf)
-    cuts
-  }
-  boot.cuts <- function(data,formula) {
-    d <- data[sample(1:nrow(data), size=nrow(data), replace=TRUE),]
-    cuts(formula=formula, data=d, indices=, cp=cp)
-  }
-  boots <- as.list(replicate(R, boot.cuts(data, formula)))
-  lengths <- sapply(boots, length)
-  do.call(rbind, boots[lengths==median(lengths)])
-}
+# boot.cutpoints <- function(data, formula, R=500, cp=0.02) {
+#   cuts <- function(formula, data, indices, cp=cp) {
+#     d <- data[indices,]
+#     tr <- rpart::prune(rpart::rpart(formula, data=d), cp=cp)
+#     cuts <- c(0, tr$splits[,"index"], Inf)
+#     cuts
+#   }
+#   boot.cuts <- function(data,formula) {
+#     d <- data[sample(1:nrow(data), size=nrow(data), replace=TRUE),]
+#     cuts(formula=formula, data=d, indices=, cp=cp)
+#   }
+#   boots <- as.list(replicate(R, boot.cuts(data, formula)))
+#   lengths <- sapply(boots, length)
+#   do.call(rbind, boots[lengths==median(lengths)])
+# }
 boot.cutpoints <- function(data, formula, R=500, cp=0.02, fun=mean) {
      cuts <- function(formula, data, indices, cp=cp) {
          d <- data[indices,]
