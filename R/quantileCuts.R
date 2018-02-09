@@ -1,5 +1,5 @@
 require(rpart)
-
+#' @export
 qCut <- function(x, probs=seq(0,1,.25), labels=NULL) {
   cut(x, breaks=quantile(x, probs=probs, na.rm=TRUE), labels=labels)
 }
