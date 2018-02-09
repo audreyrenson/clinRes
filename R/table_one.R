@@ -49,33 +49,18 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
   #include NA as a level if includeNA = TRUE
   if("cat" %in% includeNA) data[,vars[is_cat]] = lapply(data[,vars[is_cat]], addNAlevel, NAlabel=NAlabel)
 
+  tbl_cont <- if(any(!is_cat)) cont_table(vars=vars[!is_cat], varlabels=varlabels[!is_cat], data=data, strata=strata, normal=normal,
+                                         fun_norm=fun_norm, fun_nonnorm=fun_nonnorm,  fun_norm_p=fun_norm_p,
+                                         fun_nonnorm_p = fun_nonnorm_p, fun_p_fmt = fun_p_fmt,
+                                         measurelab_nonnormal=measurelab_nonnormal, nspaces=nspaces,
+                                         measurelab_normal=measurelab_normal, sep=sep, header=header,
+                                         includeNA="cont" %in% includeNA, NAlabel=NAlabel) else NULL
+  tbl_cat <- if(any(is_cat)) cat_table(vars=vars[is_cat], varlabels=varlabels[is_cat], data=data, strata=strata, exact=exact,
+                                        all_levels=all_levels, fun_n_prc=fun_n_prc,  fun_apprx_p=fun_apprx_p, fun_exact_p=fun_exact_p,
+                                        fun_p_fmt = fun_p_fmt, measurelab_cat=measurelab_cat,sep=sep, nspaces=nspaces,
+                                        header=header) else NULL
 
-  if(any(is_cat) & any(!is_cat)) {
-    tbl <- rbind(
-      cont_table(vars=vars[!is_cat], varlabels=varlabels[!is_cat], data=data, strata=strata, normal=normal,
-                 fun_norm=fun_norm, fun_nonnorm=fun_nonnorm,  fun_norm_p=fun_norm_p,
-                 fun_nonnorm_p = fun_nonnorm_p, fun_p_fmt = fun_p_fmt,
-                 measurelab_nonnormal=measurelab_nonnormal, nspaces=nspaces,
-                 measurelab_normal=measurelab_normal, sep=sep, header=header,
-                 includeNA="cont" %in% includeNA, NAlabel=NAlabel),
-      cat_table(vars=vars[is_cat], varlabels=varlabels[is_cat], data=data, strata=strata, exact=exact,
-                all_levels=all_levels, fun_n_prc=fun_n_prc,  fun_apprx_p=fun_apprx_p, fun_exact_p=fun_exact_p,
-                fun_p_fmt = fun_p_fmt, measurelab_cat=measurelab_cat,sep=sep, nspaces=nspaces, header=header)
-    )
-  } else if(any(is_cat)) {
-    tbl <-  cat_table(vars[is_cat], varlabels=varlabels[is_cat], data=data, strata=strata, exact=exact,
-                      all_levels=all_levels, fun_n_prc=fun_n_prc,  fun_apprx_p=fun_apprx_p, fun_exact_p=fun_exact_p,
-                      fun_p_fmt = fun_p_fmt, measurelab_cat=measurelab_cat,sep=sep, nspaces=nspaces, header=header)
-  } else {
-    tbl <- cont_table(vars[!is_cat], varlabels=varlabels[!is_cat], data=data, strata=strata, normal=normal,
-                      fun_norm=fun_norm, fun_nonnorm=fun_nonnorm,  fun_norm_p=fun_norm_p,
-                      fun_nonnorm_p = fun_nonnorm_p, fun_p_fmt = fun_p_fmt,
-                      measurelab_nonnormal=measurelab_nonnormal, nspaces=nspaces,
-                      measurelab_normal=measurelab_normal, sep=sep, header=header,
-                      includeNA="cont" %in% includeNA, NAlabel=NAlabel)
-  }
-
-  tbl <- rbind(n, tbl)
+  tbl <- rbind(n, tbl_cont, tbl_cat)
 
   #add row groupings if specified
   if(!is.null(groups)) {
@@ -146,6 +131,7 @@ cont_table <- function(vars, varlabels=vars, data, strata, normal=NULL,
 
   if(includeNA==FALSE) tbl <- t(t(odd(tbl)))
 
+  if(length(vars)==1) tbl <- t(tbl) # <- this is because it will return a vector if length=1 which messes up rbind()
   tbl
 }
 
