@@ -31,8 +31,9 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
                       measurelab_cat=" (%)", sep="", nspaces=6, header=NULL, groups=NULL,
                       includeNA=NULL, NAlabel="Missing (%)") {
   #checks
-  if(!all(c(vars, strata) %in% names(data)))
-      stop(paste0("Variable '", paste(c(vars, strata)[!c(vars, strata) %in% names(data)], collapse = ", "), "' not in dataset."))
+  checkvars = if(missing(strata)) vars else c(strata, vars)
+  if(!all(checkvars %in% names(data)))
+      stop(paste0("Variable '", paste(checkvars[!checkvars %in% names(data)], collapse = ", "), "' not in dataset."))
   if(length(vars) != length(varlabels)) stop("vars and varlabels must be the same length.")
 
 
