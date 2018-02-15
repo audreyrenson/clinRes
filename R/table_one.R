@@ -85,7 +85,7 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
 
   }
 
-  tbl <- do.call(rbind, list_tbls)
+  tbl <- rbind(Total, do.call(rbind, list_tbls))
 
   if(!is.null(groups)) {
     for(i in 1:length(groups)) {
