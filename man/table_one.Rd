@@ -19,7 +19,7 @@ table_one(vars = names(data), varlabels = vars, data, strata,
   measurelab_nonnormal = ", median [IQR]",
   measurelab_normal = ", mean&plusmn;SD", measurelab_cat = " (\%)",
   sep = "", nspaces = 6, header = NULL, groups = NULL,
-  includeNA = NULL, NAlabel = "Missing (\%)")
+  includeNA = NULL, NAlabel = "Missing (\%)", include_overall = FALSE)
 
 cont_table(vars, varlabels = vars, data, strata, normal = NULL,
   fun_norm = mean_sd, fun_nonnorm = median_iqr, fun_norm_p = p_cont_norm,
@@ -69,6 +69,8 @@ p_cat_apprx(x, y)
 \item{includeNA}{Character. Either "cont","cat", or c("cont","cat"). Whether or not to show the n (%) of NA's for continuous and categorical variables, respectively.}
 
 \item{NAlabel}{Character. Row label for NA rows.}
+
+\item{include_overall}{Logical. Include non-stratified column in stratified table? Default FALSE.}
 
 \item{tbl}{Matrix object returned by \code{table_one()}.}
 

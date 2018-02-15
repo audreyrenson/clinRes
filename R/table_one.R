@@ -18,7 +18,7 @@
 #' @param groups List of vectors whose elements are the names of variables in each group, and the list names are the names of the groups.
 #' @param includeNA Character. Either "cont","cat", or c("cont","cat"). Whether or not to show the n (%) of NA's for continuous and categorical variables, respectively.
 #' @param NAlabel Character. Row label for NA rows.
-#'
+#' @param include_overall Logical. Include non-stratified column in stratified table? Default FALSE.
 #' @include summary_measures.R
 #' @include formatting_functions.R
 
@@ -29,7 +29,7 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
                       fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt, fun_n_fmt = n_fmt,
                       measurelab_nonnormal=", median [IQR]", measurelab_normal=", mean&plusmn;SD",
                       measurelab_cat=" (%)", sep="", nspaces=6, header=NULL, groups=NULL,
-                      includeNA=NULL, NAlabel="Missing (%)", include_overall=TRUE) {
+                      includeNA=NULL, NAlabel="Missing (%)", include_overall=FALSE) {
   #checks
   checkvars = if(missing(strata)) vars else c(strata, vars)
   if(!all(checkvars %in% names(data)))
