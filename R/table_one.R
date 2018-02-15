@@ -85,9 +85,18 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
 
   if(include_overall & !missing(strata)) {
     #append a non-stratified table to the left-hand side
-    listargs <- as.list(sys.call())
-    listargs[[strata]] <- NULL
-    tbl <- cbind(Overall = do.call(table_one, listargs), tbl)
+    clnms <- c("Overall", colnames(tbl))
+    tbl <- cbind(table_one(vars=vars, varlabels=varlabels, data=data, normal=normal,
+                          exact=exact, all_levels=all_levels, fun_n_prc=fun_n_prc,
+                          fun_apprx_p=fun_apprx_p, fun_exact_p=fun_exact_p,
+                          fun_norm=fun_norm, fun_nonnorm=fun_nonnorm,  fun_norm_p=fun_norm_p,
+                          fun_nonnorm_p = fun_nonnorm_p, fun_p_fmt = fun_p_fmt,
+                          fun_n_fmt = fun_n_fmt, measurelab_nonnormal=measurelab_nonnormal,
+                          measurelab_normal=measurelab_normal, measurelab_cat=measurelab_cat,
+                          sep=sep, nspaces=nspaces, header=header, groups=groups,
+                          includeNA=includeNA, NAlabel=NAlabel),
+      tbl)
+    colnames(tbl) <- clnms
   }
   tbl
 }
