@@ -18,7 +18,9 @@ Imports:
   miscTools
 RoxygenNote: 6.0.1
 Collate: 
+    'cat_table.R'
     'commaList.R'
+    'cont_table.R'
     'cramersV_matrix.R'
     'ctrv.R'
     'filter_levels.R'
@@ -36,3 +38,4 @@ Collate:
     'table1_varlabs.R'
     'table_indents.R'
     'table_one.R'
+    'test_cont_table_cat_table.R'

@@ -2,8 +2,6 @@
 % Please edit documentation in R/table_one.R
 \name{table_one}
 \alias{table_one}
-\alias{cont_table}
-\alias{cat_table}
 \alias{table_one.rgroup}
 \alias{p_cont_norm}
 \alias{p_cont_nonnorm}
@@ -20,18 +18,6 @@ table_one(vars = names(data), varlabels = vars, data, strata,
   measurelab_normal = ", mean&plusmn;SD", measurelab_cat = " (\%)",
   sep = "", nspaces = 6, header = NULL, groups = NULL,
   includeNA = NULL, NAlabel = "Missing (\%)", include_overall = FALSE)
-
-cont_table(vars, varlabels = vars, data, strata, normal = NULL,
-  fun_norm = mean_sd, fun_nonnorm = median_iqr, fun_norm_p = p_cont_norm,
-  fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt,
-  measurelab_nonnormal = ", median [IQR]",
-  measurelab_normal = ", mean&plusmn;SD", sep = "", nspaces = 6,
-  header = NULL, includeNA = TRUE, NAlabel = "Missing (\%)", ...)
-
-cat_table(vars, varlabels = vars, data, strata, all_levels = FALSE,
-  exact = NULL, fun_n_prc = n_perc, fun_apprx_p = p_cat_apprx,
-  fun_exact_p = p_cat_exact, fun_p_fmt = p_fmt, measurelab_cat = " (\%)",
-  sep = "", nspaces = 6, header = NULL, ...)
 
 table_one.rgroup(tbl, indices, labels, nspaces = 6)
 

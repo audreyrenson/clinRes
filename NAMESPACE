@@ -2,10 +2,8 @@
 
 export(RR_fmt)
 export(beta_fmt)
-export(cat_table)
 export(ci_RR_fmt)
 export(ci_beta_fmt)
-export(cont_table)
 export(cramersV_matrix)
 export(ctrv)
 export(filter_levels)
