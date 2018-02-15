@@ -29,7 +29,7 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
                       fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt, fun_n_fmt = n_fmt,
                       measurelab_nonnormal=", median [IQR]", measurelab_normal=", mean&plusmn;SD",
                       measurelab_cat=" (%)", sep="", nspaces=6, header=NULL, groups=NULL,
-                      includeNA=NULL, NAlabel="Missing (%)") {
+                      includeNA=NULL, NAlabel="Missing (%)", include_overall=TRUE) {
   #checks
   checkvars = if(missing(strata)) vars else c(strata, vars)
   if(!all(checkvars %in% names(data)))
@@ -38,7 +38,7 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
 
 
   #first, get total row
-  n         = fun_n_fmt( if(missing(strata)) nrow(data) else c( table(data[[strata]]), "P-value"="") )
+  Total      = fun_n_fmt( if(missing(strata)) nrow(data) else c( n_perc(data[[strata]]), "P-value"="") )
 
   is_cat    = sapply(data[vars], function(i) class(i) %in% c("logical","character","factor"))
 
@@ -60,7 +60,7 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
                                         fun_p_fmt = fun_p_fmt, measurelab_cat=measurelab_cat,sep=sep, nspaces=nspaces,
                                         header=header) else NULL
 
-  tbl <- rbind(n, tbl_cont, tbl_cat)
+  tbl <- rbind(Total, tbl_cont, tbl_cat)
 
   #add row groupings if specified
   if(!is.null(groups)) {
@@ -83,6 +83,12 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
     }
   }
 
+  if(include_overall & !missing(strata)) {
+    #append a non-stratified table to the left-hand side
+    listargs <- as.list(sys.call())
+    listargs[[strata]] <- NULL
+    tbl <- cbind(Overall = do.call(table_one, listargs), tbl)
+  }
   tbl
 }
 
