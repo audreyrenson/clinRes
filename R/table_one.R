@@ -118,11 +118,18 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
                            fun_n_fmt = fun_n_fmt, measurelab_nonnormal=measurelab_nonnormal,
                            measurelab_normal=measurelab_normal, measurelab_cat=measurelab_cat,
                            sep=sep, nspaces=nspaces, header=header, groups=groups,
-                           includeNA=includeNA, NAlabel=NAlabel),
+                           includeNA=includeNA, NAlabel=NAlabel)$table,
                  tbl)
     colnames(tbl) <- clnms
   }
 
+  tbl <- list(table=tbl)
+  if(!missing(strata)) {
+    tbl[["strata"]] <- strata
+    tbl[["include_overall"]] <- include_overall
+    tbl[["strata_nlevs"]] <- nlevels(data[[strata]])
+  }
+  class(tbl) <- c("table_one", class(tbl))
   tbl
 }
 
@@ -174,3 +181,37 @@ addNAlevel <- function(x, NAlabel, ifany=TRUE) {
   levels(z)[is.na(levels(z))] <- NAlabel
   z
 }
+
+#S3 method for htmlTable
+htmlTable.table_one <- function(x, caption="Descriptive statistics.", ...) {
+  list_args <- list(x = x$table, caption=caption, ...)
+  if("strata" %in% names(x)) {
+    list_args[["cgroup"]] <- x$strata; list_args[["n.group"]] <- x$strata_nlevs + 1
+    if(x$include_overall) {
+      list_args$cgroup <- c("", list_args$cgroup); list_args$n.cgroup <- c(1, list_args$n.cgroup)
+    }
+  }
+
+  do.call(htmlTable, list_args)
+}
+#S3 method for kable
+#' @export
+kable <- function(x) UseMethod("kable", x)
+#' @export
+kable.default <- function(x, ...) knitr::kable(x,...)
+#' @export
+kable.table_one <- function(x, caption="Descriptive statistics.", escape=FALSE, ...) {
+  tbl_print <- knitr::kable(x$table, caption=caption, format="html",
+                            escape=escape,...)
+  if("strata" %in% names(x)) {
+    header = c(1, x$strata_nlevs + 1)
+    names(header) = c(" ",  x$strata)
+    if(x$include_overall) {
+      header[" "] <- 2
+    }
+
+    kableExtra::add_header_above(tbl_print, header=header)
+  } else tbl_print
+}
+
+
