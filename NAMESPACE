@@ -3,6 +3,7 @@
 S3method(kable,default)
 S3method(kable,table_one)
 export(RR_fmt)
+export(anova_table.cluster)
 export(beta_fmt)
 export(ci_RR_fmt)
 export(ci_beta_fmt)
