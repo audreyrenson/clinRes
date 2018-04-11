@@ -29,23 +29,24 @@
 
 #' @export
 glm_table <- function(fit, digits=4, p.digits=digits+1, se="normal", intercept=FALSE, fmt=FALSE,
-                      fun_coef = if(fit$family$link %in% c("log","logit")) exp else I, id,
-                      ...) {
+                      fun_coef = if(class(fit)[1]=="lm" || fit$family$link == c("identity")) I else exp,
+                      id, ...) {
   # this will give you a neatly formatted table with exponentiated betas
   # from a glm object. Note: does not work with interaction terms
   # ... args passed to fmt.glm_table
 
-  coefs <- if(!missing(id)) function(x) glm_robust_coefs.cluster(x, id=id) else if(se=="normal") glm_coefs else if(se=="robust") glm_robust_coefs 
+  coefs <- if(!missing(id)) function(x) glm_robust_coefs.cluster(x, id=id) else if(se=="normal") glm_coefs else if(se=="robust") glm_robust_coefs
 
   tbl_coefs <- coefs(fit)
 
   tbl_coefs[,1:3] <- round(fun_coef(tbl_coefs[,1:3]), digits)
   tbl_coefs[,4] <- round(tbl_coefs[,4], p.digits)
 
-  measure <- if(fit$family$link=="logit") {"OR"
-  } else if(fit$family$link=="log" & fit$family$family=="binomial") {"RR"
-  } else if(fit$family$link=="log" & fit$family$family=="poisson") {"IRR"
-  } else if(fit$family$link=="identity") {"Beta"}
+  measure <- if(identical(fun_coef, I)) {"Beta"
+  } else if(fit$family$link=="logit") {"OR"
+  } else if(fit$family$family=="poisson" & !is.null(fit$offset)) {"IRR"
+  } else if(fit$family$link=="log") {"RR"
+  }
 
   colnames(tbl_coefs) <- c(measure,"upr","lwr","p-value")
 

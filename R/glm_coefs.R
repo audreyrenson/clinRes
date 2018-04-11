@@ -1,10 +1,12 @@
 glm_coefs <- function(fit) {
+  s <- summary(fit)
   if(!"zeroinfl" %in% class(fit)) {
 
     tbl <- cbind(
-      coef(fit),
-      confint(fit),
-      coef(summary(fit))[,4]
+      coef(s)[,1],
+      coef(s)[,1] - 1.96*coef(s)[,2],
+      coef(s)[,1] + 1.96*coef(s)[,2],
+      coef(s)[,4]
     )
   } else if(fit$dist == "negbin") {
 
@@ -23,10 +25,11 @@ glm_coefs <- function(fit) {
 glm_robust_coefs <- function(fit) {
   cov.fit <- sandwich::vcovHC(fit, type="HC0")
   std.err <- sqrt(diag(cov.fit))
-  tbl <- cbind(coef(fit),
-               coef(fit) - 1.96 * std.err,
-               coef(fit) + 1.96 * std.err,
-               2 * pnorm(abs(coef(fit)/std.err), lower.tail=FALSE))
+  coefs <- na.omit(coef(fit))
+  tbl <- cbind(coefs,
+               coefs - 1.96 * std.err,
+               coefs + 1.96 * std.err,
+               2 * pnorm(-abs(coefs/std.err)))
 
   tbl
 }
@@ -34,11 +37,12 @@ glm_robust_coefs <- function(fit) {
 glm_robust_coefs.cluster <- function(fit,id) {
   cov.fit <- cl.vcov(fit, id)
   std.err <- sqrt(diag(cov.fit))
-  tbl <- cbind(coef(fit),
-               coef(fit) - 1.96 * std.err,
-               coef(fit) + 1.96 * std.err,
-               2 * pnorm(-abs(coef(fit)/std.err), lower.tail=FALSE))
-  
+  coefs <- na.omit(coef(fit))
+  tbl <- cbind(coefs,
+               coefs - 1.96 * std.err,
+               coefs + 1.96 * std.err,
+               2 * pnorm(-abs(coefs/std.err)))
+
   tbl
 }
 
