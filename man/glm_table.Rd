@@ -6,8 +6,8 @@
 \title{Produce a formatted generalized linear model table}
 \usage{
 glm_table(fit, digits = 4, p.digits = digits + 1, se = "normal",
-  intercept = FALSE, fmt = FALSE, fun_coef = if (fit$family$link \%in\%
-  c("log", "logit")) exp else I, id, ...)
+  intercept = FALSE, fmt = FALSE, fun_coef = if (class(fit)[1] == "lm" ||
+  fit$family$link == c("identity")) I else exp, id, ...)
 
 fmt.glm_table(glm_tbl, tbl_colnames = c(colnames(glm_tbl)[1], "95\% CI",
   "p-value"), tbl_rownames = rownames(glm_tbl), digits = 2,
