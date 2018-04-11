@@ -114,6 +114,9 @@ glm_table_indents <- function(fit, ref_txt="Ref", digits=4,
   tbl_out
 
 }
-
-
+#' @export
+anova_table.cluster <- function(fit, id) {
+  vect_id <- get_id_vector(fit, id)
+  car::Anova(fit, vcov.=function(f) sandwich::vcovCL(f, cluster=vect_id))
+}
 

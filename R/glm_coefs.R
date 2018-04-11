@@ -35,10 +35,9 @@ glm_robust_coefs <- function(fit) {
 }
 
 glm_robust_coefs.cluster <- function(fit,id) {
-  stopifnot(id %in% names(fit$data))
 
   #get vector of id variable for samples in model
-  vect_id <- as.factor(fit$data[rownames(model.frame(fit)), id])
+  vect_id <- get_id_vector
 
   cov.fit <- cl.vcov(fit, vect_id)
   std.err <- sqrt(diag(cov.fit))
@@ -51,6 +50,10 @@ glm_robust_coefs.cluster <- function(fit,id) {
   tbl
 }
 
+get_id_vector <- function(fit, id) {
+  stopifnot(id %in% names(fit$data))
+  as.factor(fit$data[rownames(model.frame(fit)), id])
+}
 
 cl.vcov   <- function(fit, id){
  # attach(dat, warn.conflicts = F)
