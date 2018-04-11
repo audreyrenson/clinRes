@@ -37,9 +37,9 @@ glm_robust_coefs <- function(fit) {
 glm_robust_coefs.cluster <- function(fit,id) {
 
   #get vector of id variable for samples in model
-  vect_id <- get_id_vector
+  vect_id <- get_id_vector(fit, id)
 
-  cov.fit <- cl.vcov(fit, vect_id)
+  cov.fit <- sandwich::vcovCL(fit, vect_id)
   std.err <- sqrt(diag(cov.fit))
   coefs <- na.omit(coef(fit))
   tbl <- cbind(coefs,
