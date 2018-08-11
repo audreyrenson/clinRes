@@ -1,7 +1,8 @@
 cat_table <- function(varname, varlabel=varname, data, strata, all_levels=FALSE,
-                      fun_format, fun_p, fun_p_fmt, measurelab=" (%)",
+                      fun_format = n_perc, fun_p = p_cat_apprx,
+                      fun_p_fmt = p_fmt, measurelab=" (%)",
                       sep="", nspaces=6,  header=NULL,
-                      includeNA=TRUE, NAlabel="Missing (%)",...) {
+                      includeNA=TRUE, NAlabel="Missing (%)",test=TRUE, ...) {
 
   ncols    = if(missing(strata)) 1 else nlevels(data[[strata]])  #ncols doesn't include the p column for now
   nlevs    = nlevels(data[[varname]])
@@ -19,19 +20,37 @@ cat_table <- function(varname, varlabel=varname, data, strata, all_levels=FALSE,
     tbl      = matrix(tbl, ncol=ncols, dimnames=list(names(tbl),
                                                      if(is.null(header)) "Overall" else header))
   } else {
-    p_x      = data[[varname]] [!data[[varname]]==NAlabel] # <- drop NAs from the p_value calculation
-    p_y      = data[[strata]] [!data[[varname]]==NAlabel] # <- drop NAs from the p_value calculation
-    p_val    = fun_p_fmt(fun_p(p_x, p_y))
-    p_row    = c(blank_row, p_val)
 
-    if(nlevs==2 & !all_levels) {
-      tbl <- rbind( c(fun_format(data[[varname]], data[[strata]])[2,], p_val) )
-    } else {
-      tbl <- rbind(p_row, cbind(fun_format(data[[varname]], data[[strata]]),""))
+    #set up the bones of the stratified table to be modified as needed
+    tbl <- cbind(fun_format(data[[varname]], data[[strata]]))
+    if(nlevs==2 & !all_levels) tbl <- tbl[2, , drop=FALSE]
+
+    if(test) { #add p-values
+      p_x      = data[[varname]] [!data[[varname]]==NAlabel] # <- drop NAs from the p_value calculation
+      p_y      = data[[strata]] [!data[[varname]]==NAlabel] # <- drop NAs from the p_value calculation
+      p_val    = fun_p_fmt(fun_p(p_x, p_y))
+      p_row    = c(blank_row, p_val)
+
+      if(nlevs==2 & !all_levels) {
+        tbl <- cbind(tbl, p_val)
+      } else {
+        tbl <- rbind(p_row, cbind(tbl,""))
+      }
+
+      colnames(tbl)[ncol(tbl)] <- "P-value"
+
+    } else { #or not
+
+      #this just adds a blank row for the variable label to a multi-row group,
+      #when not using a p-value
+
+      if(nlevs > 2 | all_levels) {
+        tbl <- rbind("", tbl)
+      }
+
     }
 
 
-    colnames(tbl)[ncol(tbl)] <- "P-value"
     if(!is.null(header)) colnames(tbl) = header
 
   }

@@ -1,8 +1,9 @@
 #let these expect one variable
 cont_table <- function(varname, varlabel=varname, data, strata,
-                       fun_format, fun_p, fun_p_fmt, measurelab,
+                       fun_format = mean_sd, fun_p = p_cont_norm,
+                       fun_p_fmt = p_fmt, measurelab = ", mean&plusmn;SD",
                        sep="", nspaces=6,  header=NULL,
-                       includeNA=TRUE, NAlabel="Missing (%)", ...) {
+                       includeNA=TRUE, NAlabel="Missing (%)", test=TRUE, ...) {
 
   spaces = paste(rep("&nbsp;", nspaces), collapse = "") #this is only applicable to the NA rows
 
@@ -16,14 +17,16 @@ cont_table <- function(varname, varlabel=varname, data, strata,
     colnames(tbl) =  if(is.null(header)) "Overall" else header
 
   } else {
-    #otherwise, it is a matrix with ncol=nlevels(strata) and an appropriate p value for varname
+    #otherwise, it is a matrix with ncol=nlevels(strata) - bones of table to be modified:
     tbl <-
       rbind(
         fun_format(data[[ varname ]], data[[ strata ]] ),
         getNAs(x = data[[ varname ]], data[[ strata]])
       )
-    tbl <- cbind(tbl, "P-value"=c(fun_p_fmt(fun_p(data[[strata]],data[[varname]])),""))
 
+    if(test) { # and add p value if requested
+      tbl <- cbind(tbl, "P-value"=c(fun_p_fmt(fun_p(data[[strata]],data[[varname]])),""))
+    }
     if(!is.null(header)) colnames(tbl) = header
   }
   rownames(tbl) <- c(rbind(                   #rownames will be the same either way.

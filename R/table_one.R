@@ -19,17 +19,19 @@
 #' @param includeNA Character. Either "cont","cat", or c("cont","cat"). Whether or not to show the n (%) of NA's for continuous and categorical variables, respectively.
 #' @param NAlabel Character. Row label for NA rows.
 #' @param include_overall Logical. Include non-stratified column in stratified table? Default FALSE.
+#' @param test Logical. Include hypothesis tests in a stratified table?
 #' @include summary_measures.R
 #' @include formatting_functions.R
 
 #' @export
-table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NULL, exact=NULL, all_levels=FALSE,
+table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NULL, exact=NULL,
+                      all_levels=FALSE,
                       fun_n_prc=n_perc,  fun_apprx_p=p_cat_apprx, fun_exact_p=p_cat_exact,
                       fun_norm=mean_sd, fun_nonnorm=median_iqr,  fun_norm_p=p_cont_norm,
                       fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt, fun_n_fmt = n_fmt,
                       measurelab_nonnormal=", median [IQR]", measurelab_normal=", mean&plusmn;SD",
                       measurelab_cat=" (%)", sep="", nspaces=6, header=NULL, groups=NULL,
-                      includeNA=NULL, NAlabel="Missing (%)", include_overall=FALSE) {
+                      includeNA=NULL, NAlabel="Missing (%)", include_overall=FALSE, test=TRUE) {
   #checks
   checkvars = if(missing(strata)) vars else c(strata, vars)
   if(!all(checkvars %in% names(data)))
@@ -38,7 +40,8 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
 
 
   #first, get total row
-  Total      = fun_n_fmt( if(missing(strata)) nrow(data) else c( n_perc(data[[strata]]), "P-value"="") )
+  Total      = fun_n_fmt( if(missing(strata)) nrow(data) else n_perc(data[[strata]]))
+  Total      = if(test & !missing(strata)) cbind(rbind(Total), "P-value"="") else Total
 
   #figure out which are categorical
   is_cat    = sapply(data[vars], function(i) class(i) %in% c("logical","character","factor"))
@@ -65,7 +68,8 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
         measurelab=measurelab_cat,
         sep=sep, nspaces=nspaces,  header=header,
         includeNA="cat" %in% includeNA,
-        NAlabel=NAlabel
+        NAlabel=NAlabel,
+        test=test
       )
     } else {
       list_tbls[[i]] <- cont_table(
@@ -79,7 +83,8 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
         measurelab=if(vars[i] %in% normal) measurelab_normal else measurelab_nonnormal,
         sep=sep, nspaces=nspaces,  header=header,
         includeNA="cont" %in% includeNA,
-        NAlabel=NAlabel
+        NAlabel=NAlabel,
+        test=test
       )
     }
 

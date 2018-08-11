@@ -16,7 +16,7 @@ Imports:
   ggplot2,
   lsr,
   miscTools
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 Collate: 
     'cat_table.R'
     'commaList.R'
@@ -38,3 +38,4 @@ Collate:
     'table1_varlabs.R'
     'table_indents.R'
     'table_one.R'
+    'test_dat.R'
