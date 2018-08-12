@@ -2,7 +2,8 @@ cat_table <- function(varname, varlabel=varname, data, strata, all_levels=FALSE,
                       fun_format = n_perc, fun_p = p_cat_apprx,
                       fun_p_fmt = p_fmt, measurelab=" (%)",
                       sep="", nspaces=6,  header=NULL,
-                      includeNA=TRUE, NAlabel="Missing (%)",test=TRUE, ...) {
+                      includeNA=TRUE, NAlabel="Missing (%)",test=TRUE,
+                      digits=1, p.digits=3, ...) {
 
   ncols    = if(missing(strata)) 1 else nlevels(data[[strata]])  #ncols doesn't include the p column for now
   nlevs    = nlevels(data[[varname]])
@@ -16,19 +17,19 @@ cat_table <- function(varname, varlabel=varname, data, strata, all_levels=FALSE,
 
   if(missing(strata)) {
     #first deal with the simplest case -- missing strata.
-    tbl      = if(nlevs==2 & !all_levels) c(fun_format(data[[varname]])[2]) else c(blank_row, fun_format(data[[varname]]))
+    tbl      = if(nlevs==2 & !all_levels) c(fun_format(data[[varname]], digits=digits)[2]) else c(blank_row, fun_format(data[[varname]], digits=digits))
     tbl      = matrix(tbl, ncol=ncols, dimnames=list(names(tbl),
                                                      if(is.null(header)) "Overall" else header))
   } else {
 
     #set up the bones of the stratified table to be modified as needed
-    tbl <- cbind(fun_format(data[[varname]], data[[strata]]))
+    tbl <- cbind(fun_format(data[[varname]], data[[strata]], digits=digits))
     if(nlevs==2 & !all_levels) tbl <- tbl[2, , drop=FALSE]
 
     if(test) { #add p-values
       p_x      = data[[varname]] [!data[[varname]]==NAlabel] # <- drop NAs from the p_value calculation
       p_y      = data[[strata]] [!data[[varname]]==NAlabel] # <- drop NAs from the p_value calculation
-      p_val    = fun_p_fmt(fun_p(p_x, p_y))
+      p_val    = fun_p_fmt(fun_p(p_x, p_y), digits=p.digits)
       p_row    = c(blank_row, p_val)
 
       if(nlevs==2 & !all_levels) {

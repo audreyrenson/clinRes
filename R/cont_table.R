@@ -3,14 +3,15 @@ cont_table <- function(varname, varlabel=varname, data, strata,
                        fun_format = mean_sd, fun_p = p_cont_norm,
                        fun_p_fmt = p_fmt, measurelab = ", mean&plusmn;SD",
                        sep="", nspaces=6,  header=NULL,
-                       includeNA=TRUE, NAlabel="Missing (%)", test=TRUE, ...) {
+                       includeNA=TRUE, NAlabel="Missing (%)", test=TRUE,
+                       digits=1, p.digits=3, ...) {
 
   spaces = paste(rep("&nbsp;", nspaces), collapse = "") #this is only applicable to the NA rows
 
   if(missing(strata)) {
     #if there is no strata variable, this is just one column and no p-value
     tbl <- rbind(
-        fun_format(data[[ varname ]]), # <- this creates the row of the actual measure(s) (/and p-value)
+        fun_format(data[[ varname ]], digits=digits), # <- this creates the row of the actual measure(s) (/and p-value)
         getNAs(data[[ varname ]]) # <- this creates the NA row
     )
 
@@ -20,12 +21,12 @@ cont_table <- function(varname, varlabel=varname, data, strata,
     #otherwise, it is a matrix with ncol=nlevels(strata) - bones of table to be modified:
     tbl <-
       rbind(
-        fun_format(data[[ varname ]], data[[ strata ]] ),
+        fun_format(data[[ varname ]], data[[ strata ]], digits=digits ),
         getNAs(x = data[[ varname ]], data[[ strata]])
       )
 
     if(test) { # and add p value if requested
-      tbl <- cbind(tbl, "P-value"=c(fun_p_fmt(fun_p(data[[strata]],data[[varname]])),""))
+      tbl <- cbind(tbl, "P-value"=c(fun_p_fmt(fun_p(data[[strata]],data[[varname]]), digits=p.digits),""))
     }
     if(!is.null(header)) colnames(tbl) = header
   }

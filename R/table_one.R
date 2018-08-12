@@ -7,6 +7,9 @@
 #' @param varlables Character vector. The labels for variables in the returned table. Should be the same length as \code{var}.
 #' @param data Data.frame in which to look for variables.
 #' @param strata Character. Stratifying variable.
+#' @param digits Integer. Number of digits passed to formatting function except quantile and p-value formats (see below).
+#' @param q.digits Integer. Number of digits passed to fun_nonnorm (the default of which is median_iqr())
+#' @param p.digits Integer. Number of digits passed to p_fmt.
 #' @param normal Character vector. Variables to treat as normally distributed. If not included in this, numeric variables are considered non-normal.
 #' @param exact Character vector. Variable to perform exact tests on.
 #' @param fun_n_prc,fun_norm,fun_nonnorm Summary measure functions.
@@ -20,12 +23,13 @@
 #' @param NAlabel Character. Row label for NA rows.
 #' @param include_overall Logical. Include non-stratified column in stratified table? Default FALSE.
 #' @param test Logical. Include hypothesis tests in a stratified table?
+#'
 #' @include summary_measures.R
 #' @include formatting_functions.R
 
 #' @export
 table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NULL, exact=NULL,
-                      all_levels=FALSE,
+                      all_levels=FALSE, digits=1, q.digits=0, p.digits=3,
                       fun_n_prc=n_perc,  fun_apprx_p=p_cat_apprx, fun_exact_p=p_cat_exact,
                       fun_norm=mean_sd, fun_nonnorm=median_iqr,  fun_norm_p=p_cont_norm,
                       fun_nonnorm_p = p_cont_nonnorm, fun_p_fmt = p_fmt, fun_n_fmt = n_fmt,
@@ -40,7 +44,7 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
 
 
   #first, get total row
-  Total      = fun_n_fmt( if(missing(strata)) nrow(data) else n_perc(data[[strata]]))
+  Total      = fun_n_fmt( if(missing(strata)) nrow(data) else n_perc(data[[strata]], digits=digits))
   Total      = if(test & !missing(strata)) cbind(rbind(Total), "P-value"="") else Total
 
   #figure out which are categorical
@@ -69,7 +73,9 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
         sep=sep, nspaces=nspaces,  header=header,
         includeNA="cat" %in% includeNA,
         NAlabel=NAlabel,
-        test=test
+        test=test,
+        digits=digits,
+        p.digits=p.digits
       )
     } else {
       list_tbls[[i]] <- cont_table(
@@ -84,7 +90,9 @@ table_one <- function(vars=names(data), varlabels=vars, data, strata, normal=NUL
         sep=sep, nspaces=nspaces,  header=header,
         includeNA="cont" %in% includeNA,
         NAlabel=NAlabel,
-        test=test
+        test=test,
+        digits=if(vars[i] %in% normal) digits else q.digits,
+        p.digits=p.digits
       )
     }
 

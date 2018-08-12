@@ -32,4 +32,5 @@ cont_table("ISS",data=test_dat, strata="gender", test=FALSE)
 cont_table("ISS",data=test_dat, strata="gender", test=TRUE)
 
 table_one(vars=c("age","ISS","race_ethnicity","gender","diabetes","Hx_MI","cancer"), data=test_dat,
-          strata="exposed", groups = list(Comorbidities = c("diabetes","Hx_MI","cancer")), test=TRUE)
+          strata="exposed", groups = list(Comorbidities = c("diabetes","Hx_MI","cancer")), test=TRUE,
+          normal = "age", digits=0)

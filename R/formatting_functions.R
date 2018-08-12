@@ -6,16 +6,16 @@
 
 #regression / RR's etc
 #' @export
-beta_fmt = function(b) format(as.numeric(b), digits=digits, nsmall=digits)
+beta_fmt = function(b, digits=2) format(as.numeric(b), digits=digits, nsmall=digits)
 #' @export
 #' @rdname beta_fmt
-ci_beta_fmt = function(lwr, upr, sep=" to ") paste0(beta_fmt(lwr), sep, beta_fmt(upr))
+ci_beta_fmt = function(lwr, upr, sep=" to ", digits=2) paste0(beta_fmt(lwr, digits), sep, beta_fmt(upr, digits))
 #' @export
 #' @rdname beta_fmt
-RR_fmt <- function(RR) format(as.numeric(RR), digits=2, nsmall=2)
+RR_fmt <- function(RR, digits=2) format(as.numeric(RR), digits=digits, nsmall=digits)
 #' @export
 #' @rdname beta_fmt
-ci_RR_fmt <- function(lwr, upr, sep=" to ") paste0(RR_fmt(lwr), sep, RR_fmt(upr))
+ci_RR_fmt <- function(lwr, upr, sep=" to ", digits=2) paste0(RR_fmt(lwr, digits), sep, RR_fmt(upr, digits))
 #p values
 #' @export
 #' @rdname beta_fmt
@@ -23,13 +23,13 @@ p_fmt <- function(p, digits=3, eps=10^-digits) ifelse(p<eps, paste0("<",eps), fo
 #unvariate statistics
 #' @export
 #' @rdname beta_fmt
-prop_fmt <- function(x) paste0(" (",formatC(x*100, digits=1, width = 4, format="f"),"%)")
+prop_fmt <- function(x, digits=1) paste0(" (",formatC(x*100, digits=digits, width = digits+3, format="f"),"%)")
 #' @export
 #' @rdname beta_fmt
-sd_fmt <- function(x) paste0("&plusmn;", mean_fmt(x))
+sd_fmt <- function(x, digits=1) paste0("&plusmn;", mean_fmt(x, digits=digits))
 #' @export
 #' @rdname beta_fmt
-mean_fmt <- function(x) formatC(x, digits=1, width=4, format="f")
+mean_fmt <- function(x, digits=1) formatC(x, digits=digits, width=digits+3, format="f")
 #' @export
 #' @rdname beta_fmt
 n_fmt <- function(x) {
@@ -37,10 +37,10 @@ n_fmt <- function(x) {
   formatC(x, width=5, format="d") }
 #' @export
 #' @rdname beta_fmt
-median_fmt <- function(x) formatC(x, digits=1, width=4, format="f")
+median_fmt <- function(x, digits=0) formatC(x, digits=digits, width=digits+3, format="f")
 #' @export
 #' @rdname beta_fmt
-iqr_fmt <- function(lwr, upr, sep=" to ", bracket=c("[","]")) paste0(bracket[1],median_fmt(lwr), sep, median_fmt(upr),bracket[2])
+iqr_fmt <- function(lwr, upr, sep=" to ", bracket=c("[","]"), digits=0) paste0(bracket[1],median_fmt(lwr, digits=digits), sep, median_fmt(upr, digits=digits),bracket[2])
 #' @export
 #' @rdname beta_fmt
 range_fmt <- iqr_fmt
